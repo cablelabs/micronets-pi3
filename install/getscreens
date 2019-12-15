@@ -1,7 +1,7 @@
 #!/bin/bash
 # Retrieve captured screenshots from Pi device
 
-if [ ! -z $1 ]; then 
+if [ -z $1 ]; then 
 	echo "usage ./getscreens <host> (eg. micronets@192.168.0.22)"
 else
 	rsync --verbose --force --rsync-path="sudo rsync" $1:/etc/micronets/screenshots/* ~/github/micronets/micronets-pi3/screenshots
