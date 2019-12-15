@@ -7,6 +7,7 @@ from .tk_main import TKMain
 from utils.config import *
 import pyscreenshot as ImageGrab
 import utils.globals as globals
+import utils.wpa_cli as wpa_cli
 
 from utils.syslogger import SysLogger
 logger = SysLogger().logger()
@@ -145,6 +146,13 @@ class TKApp():
 			screenshot = ImageGrab.grab(bbox=(self.main_x, self.main_y, self.main_x+320, self.main_y+240))
 
 		screenshot.save(filepath)
+
+	def restart(self):
+		os.popen("sudo systemctl restart lightdm")
+
+	def reboot(self):
+		os.popen("sudo reboot now")
+
 
 	# event handler to toggle the TFT backlight
 	def toggle_backlight(self, null_arg=0):

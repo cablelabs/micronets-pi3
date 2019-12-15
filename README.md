@@ -53,6 +53,19 @@ cd /etc/micronets/python3
 sudo /usr/bin/python3 proto_pi.py &
 ```
 
+## Required sudo privileges
+```
+micronets ALL=NOPASSWD: /usr/bin/rsync
+micronets ALL=NOPASSWD: /usr/bin/python protodpp.py
+micronets ALL=NOPASSWD: /usr/bin/python3 proto-pi.py
+micronets ALL=NOPASSWD: /usr/bin/vi
+micronets ALL=NOPASSWD: /sbin/reboot
+micronets ALL=NOPASSWD: /sbin/shutdown
+micronets ALL=NOPASSWD: /bin/systemctl restart lightdm
+
+```
+
+
 ## System Installation
 Starting from a bare Raspbian installation, here is an edited history file detailing package installation:
 (It is likely that some pieces have escaped my history and therefore missing)
@@ -64,6 +77,8 @@ TODO:
 	sudo groupadd micronets
 	sudo usermod -a -G micronets <username>
 	sudo usermod -a -G micronets pi
+	sudo usermod -a -G gpio <username>
+	sudo usermod -a -G gpio pi
 	sudo apt-get install python-dev python-pip
 	sudo pip install --upgrade distribute
 	sudo pip install ipython

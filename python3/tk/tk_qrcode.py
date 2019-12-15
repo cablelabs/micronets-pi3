@@ -42,8 +42,8 @@ class TKQRCode(TKWidget):
 
 	def destroy(self):
 		#self.hide_widget(self.label)
-		self.label.saveicon = None
-		self.label.savephoto = None
-		self.label = None
+		#self.label.saveicon = None
+		#self.label.savephoto = None
+		#self.label = None
 		self.hide()
 

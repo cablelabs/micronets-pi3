@@ -37,6 +37,9 @@ def wpa_reset(all=False):
 	cmd = "sudo wpa_cli reconfigure"
 	os.popen(cmd)
 
+	cmd = "sudo wpa_cli reassociate"
+	os.popen(cmd)
+
 def wpa_subscriber_exists():
 	certFile = Path("/etc/micronets/networks/subscriber/wifi.crt")
 	return certFile.is_file()

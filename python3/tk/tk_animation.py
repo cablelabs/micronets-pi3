@@ -16,7 +16,7 @@ frame_interval = .05
 
 class TKAnimation(TKWidget):
 
-	def __init__(self,parent, filename, duration, callback=None, preload=True, l=0, t=40, w=280, h=160, show=False):
+	def __init__(self,parent, filename, duration, callback=None, preload=True, l=0, t=40, w=280, h=160, cancel_tap=True, show=False):
 
 		TKWidget.__init__(self)
 
@@ -38,11 +38,17 @@ class TKAnimation(TKWidget):
 		self.callback = callback
 		self.loading = False
 		self.cancel_animation = False
+		# TODO: allow for playing the whole animation. Pass 0 duration??
 		self.frame_count = int(duration / frame_interval)
-		self.can_unload = True
+
+
+		# tap to cancel animation
+		if cancel_tap:
+			self.image.bind("<Button-1>",self.cancel)
+
 
 		if preload:
-			thr = threading.Thread(target=self.load_frames, args=()).start()
+			self.preload()
 
 	def load_frames(self):
 
@@ -80,15 +86,22 @@ class TKAnimation(TKWidget):
 		else:
 			loading = False
 
+	def preload(self):
+		thr = threading.Thread(target=self.load_frames, args=()).start()
+
 	def unload(self):
 		self.frames = []
 		self.frames_loaded = 0
 		self.frame_count = 0
 		self.loading = False
-		self.cancel_animation = False
 		self.image.save = None
 
-	def cancel(self):
+	def start(self):
+		thr = threading.Thread(target=self.animate, args=()).start()
+		self.show()		
+		pass
+
+	def cancel(self, null_arg=0):
 		self.cancel_animation = True
 
 	def animate(self):
@@ -103,7 +116,7 @@ class TKAnimation(TKWidget):
 			self.load_frames()
 
 		i = 0
-		while i <= self.frame_count:
+		while i <= self.frame_count and not self.cancel_animation:
 
 			max_frames = self.frames_loaded	# avoid race condition with unload
 			if max_frames:
@@ -113,164 +126,9 @@ class TKAnimation(TKWidget):
 				self.image.save = photo # prevent from being garbage collected while active
 				time.sleep(frame_interval)
 				i += 1
-				if self.cancel_animation and self.callback:
-					self.callback(True)
-					self.hide()
-					return
 
 		if self.callback:
-			self.callback(False)
+			logger.info("animation " + "completed" if self.cancel_animation else "canceled")
+			self.callback(self.cancel_animation)
 			self.hide()
 
-	def start(self):
-		thr = threading.Thread(target=self.animate, args=()).start()
-		self.show()		
-		pass
-
-	def stop(self):
-		self.cancel_animation = False
-
-	
-
-
-
-	'''
-# animate frames
-	i = 0
-	ethernet_displayed = False
-	#ethernet_displayed = True
-
-	wifi_ssid = None
-	wifi_ip = None
-
-	while i <= frame_count:
-		index = i % len(frames)
-		photo = PIL.ImageTk.PhotoImage(frames[index])
-		splash_image.config(image=photo)
-		splash_image.image = photo # prevent from being garbage collected while active
-		time.sleep(frame_interval)
-		i += 1
-		#header.config(text=str(i))
-
-		# display ethernet address when starting up, if connected.
-		if not ethernet_displayed:
-			ethernet_ip = get_ethernet_ipaddress()
-			if (ethernet_ip):
-				footer.config(text="ETH: "+ ethernet_ip)
-				ethernet_displayed = True
-
-		# check for wifi connected
-		if not wifi_ssid:
-			wifi_ssid = get_ssid()
-		elif not wifi_ip:
-			wifi_ip = get_wifi_ipaddress()
-		else:
-			# we're connected and online.
-			if i > min_frame_count:
-				# end animation
-				frame_count = 0
-				display_demo_status()
-				add_connected_messages()
-
-		if i == frame_count:
-			# end of animation and not connected
-			if not has_network():
-				add_message("Not provisioned.")                
-			elif not get_ssid():
-				clear_messages()
-				add_message("Not associated:")
-				stanza = get_network_stanza()
-				for line in stanza:
-					line = line.replace("\n", "").replace("\t","  ")
-					if len(line) > 35:
-						line = line[:35]+'...'
-					add_message(line)
-			else:
-				add_message("Associated: "+ get_ssid())
-				if not get_wifi_ipaddress():
-					add_message("No IP address")
-			display_demo_status()
-
-	# clean up
-	photo = None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	def animate_fireworks():
-
-	global demo_ssid, demo_wifi_ip
-
-	file_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'images', 'fireworks320-01.gif'))
-
-	gif = PIL.Image.open(file_path, 'r')
-	frames = []
-
-	frame_interval = .05
-	fireworks_duration = config.get('onboardAnimationSeconds', 5)
-	frame_count = int(fireworks_duration / frame_interval)
-
-	try:
-		i = 0
-		while i < frame_count:
-			i += 1
-			frames.append(gif.copy())
-			gif.seek(len(frames))
-	except EOFError:
-		pass
-
-	# prepare frame to receive images
-	fireworks_image = Label(window, bg = 'black')
-	place_widget(fireworks_image,0, banner_h, main_w, main_h)
-	fireworks_image['bg'] = demo_frame['bg']
-	show_widget(demo_frame)
-	
-	# allow canceling of the animation by touching the image
-	fireworks_image.bind("<Button-1>", cancel_fireworks)
-
-	hide_widget(splash_frame)
-	# animate frames
-	frame_count = len(frames)
-	i = 0
-	while i < frame_count:
-	#for frame in frames:
-		frame = frames[i]
-		photo = PIL.ImageTk.PhotoImage(frame)
-		fireworks_image.config(image=photo)
-		fireworks_image.image = photo # prevent from being garbage collected while active
-		time.sleep(frame_interval)
-		i += 1
-
-	# clean up
-	photo = None
-
-	hide_widget(fireworks_image)
-	#hide_widget(demo_frame)
-
-	if fireworks_image:
-		fireworks_image.config(image=None)
-		fireworks_image.image = None
-		fireworks_image['bg'] = None
-
-
-	add_connected_messages()
-	display_demo_status()
-
-
-def display_fireworks():
-	add_message("start fireworks")
-	thr = threading.Thread(target=animate_fireworks, args=()).start()
-
-	'''

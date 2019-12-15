@@ -32,6 +32,3 @@ def get_mac():
 
 def is_connected():
 	return (get_ssid() and get_wifi_ipaddress())
-
-def cycle_wifi():
-	pass

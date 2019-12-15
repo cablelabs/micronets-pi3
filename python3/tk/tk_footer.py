@@ -21,10 +21,10 @@ class TKFooter(TKWidget):
 	def clear(self):
 		self.frame.config(text="")
 
-	def set_text(text):
+	def set_text(self, text):
 		self.frame.config(text=text)
 
-	def set_font(font):
+	def set_font(self, font):
 		self.frame.config(font=font)
 
 	def update():

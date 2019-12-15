@@ -23,6 +23,7 @@ class TKWidget():
 	font2=("HelveticaNeue-Light", 16, 'normal')
 	font3=("HelveticaNeue-Light", 12, 'normal')
 	font4=("HelveticaNeue-Light", 18, 'normal')
+	font5=("HelveticaNeue-Light", 8, 'normal')
 
 	def __init__(self):
 		self.frame = None

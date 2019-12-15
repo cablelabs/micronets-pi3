@@ -9,12 +9,12 @@ logger = SysLogger().logger()
 
 chan_freqs = {1:2412, 2:2417, 3:2422, 4:2427, 5:2432, 6:2437, 7:2442, 8:2447, 9:2452, 10:2457, 11:2462, 12:2467, 13:2472, 14:2484}
 
-def dpp_bootstrap_gen():
+def dpp_bootstrap_gen(mac):
 
 	logger.info("** generate_dpp_uri **")
 
 	cmd = "sudo wpa_cli dpp_bootstrap_gen type=qrcode mac={} chan={}/{} key={} info={}".format(
-		network.get_mac(),
+		mac,
 		config.get('channelClass'),
 		config.get('channel'),
 		config.get('p256'),

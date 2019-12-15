@@ -5,6 +5,7 @@ from enum import Enum
 
 from utils.syslogger import SysLogger
 from utils.config import config
+import utils.wpa_supplicant as wpa_supplicant
 import utils.globals as globals
 import utils.network as network
 import utils.wpa_cli as wpa_cli
@@ -19,6 +20,7 @@ from tk.tk_status import TKStatus
 from tk.tk_buttons import TKButtons
 from tk.tk_qrcode import TKQRCode
 from tk.tk_messages import TKMessages
+from tk.tk_settings import TKSettings
 from tk.tk_animation import TKAnimation
 
 # TODO: 
@@ -33,6 +35,7 @@ class AppState(Enum):
 	QRCODE = 2
 	FIREWORKS = 3
 	MESSAGES = 4
+	SETTINGS = 5
 
 # Logfile is /tmp/<argv[0]>.log
 logger = SysLogger().logger()
@@ -82,6 +85,7 @@ class ProtoDPP(TKApp):
 		self.status_window = TKStatus(self.main_window)
 		self.message_window = TKMessages(self.main_window)
 		self.footer_window = TKFooter(self.main_window)
+		self.settings_window = TKSettings(self.main_window, self.settings_event)
 
 		# Buttons panel
 		self.buttons_window = TKButtons(self.main_window)
@@ -99,8 +103,9 @@ class ProtoDPP(TKApp):
 		self.qrcode_window = TKQRCode(self.main_window)
 
 		# Animations
-		self.splash_window = TKAnimation(self.main_window, 'earth.gif', 5, self.splash_end_event)
+		self.splash_window = TKAnimation(self.main_window, 'earth.gif', 6, self.splash_end_event)
 		self.fireworks_window = TKAnimation(self.main_window, 'fireworks.gif', 2, self.fireworks_end_event)
+		self.wait_window = TKAnimation(self.main_window, 'loading.gif', 2, self.wait_end_event)
 
 		## UI state management ##
 
@@ -110,16 +115,18 @@ class ProtoDPP(TKApp):
 			AppState.FIREWORKS: [self.display_fireworks, None],
 			AppState.STATUS: [self.display_status, None],
 			AppState.QRCODE: [self.display_qrcode, self.end_qrcode],
+			AppState.SETTINGS: [None, None],
 			AppState.MESSAGES: [None, None]
 		}
 
 		# Window visibility vectors
 		self.base_windows = [self.header_window, self.footer_window, self.buttons_window]
-		self.all_windows = self.base_windows + [self.splash_window, self.status_window, self.message_window, self.fireworks_window, self.qrcode_window]
+		self.all_windows = self.base_windows + [self.splash_window, self.settings_window, self.status_window, self.message_window, self.fireworks_window, self.qrcode_window]
 
 		self.visible_windows = {
 			AppState.SPLASH: self.base_windows + [self.splash_window],
 			AppState.STATUS: self.base_windows + [self.status_window],
+			AppState.SETTINGS: self.base_windows + [self.settings_window],
 			AppState.QRCODE: [self.buttons_window, self.qrcode_window],
 			AppState.FIREWORKS: self.base_windows + [self.fireworks_window],
 			AppState.MESSAGES: self.base_windows + [self.message_window]
@@ -132,6 +139,7 @@ class ProtoDPP(TKApp):
 		self.visible_buttons = {
 			AppState.SPLASH: self.standard_buttons,
 			AppState.STATUS: self.standard_buttons,
+			AppState.SETTINGS: [self.shutdown_button],
 			AppState.QRCODE: [self.countdown_button, self.shutdown_button],
 			AppState.FIREWORKS: self.standard_buttons,
 			AppState.MESSAGES: self.standard_buttons,
@@ -170,7 +178,8 @@ class ProtoDPP(TKApp):
 		self.update_status()
 
 	def display_qrcode(self):
-		uri = wpa_cli.dpp_bootstrap_gen()
+		wpa_supplicant.wpa_reset(True)
+		uri = wpa_cli.dpp_bootstrap_gen(network.get_mac())
 		self.qrcode_window.generate(uri)
 		wpa_cli.dpp_listen()
 		self.cancel_qrcode = False
@@ -191,10 +200,21 @@ class ProtoDPP(TKApp):
 		logger.info("end fireworks")
 		self.fireworks_window.unload()
 
+	def reset_wifi(self):
+		wpa_supplicant.wpa_reset(True)
+		self.set_state(AppState.STATUS)
+
+	def cycle_wifi(self):
+		wpa_cli.reconfigure()
+		wpa_cli.reassociate()
+
+		Timer(2.0, self.set_state,[AppState.STATUS]).start()
+
+
 	# Timer events
 	def qrcode_timer_event(self):
 
-		logger.info("qrcode timer")
+		#logger.info("qrcode timer")
 
 		self.countdown_button.set_text(str(self.qrc_counter))
 		self.qrc_counter -= 1
@@ -218,6 +238,42 @@ class ProtoDPP(TKApp):
 		if not canceled:
 			self.set_state(AppState.STATUS)
 
+	def wait_end_event(self, canceled):
+		logger.info("wait ended. canceled: "+ str(canceled))
+		if not canceled:
+			self.set_state(AppState.STATUS)
+
+	# Settings window callbacks
+	def settings_event(self, reason, param=None):
+		if reason == TKSettings.CB_DONE:
+			if param == True:
+				# Mode changed.
+				self.message_window.clear()
+				self.message_window.add_message("Restarting Application..")
+				self.set_state(AppState.MESSAGES)
+
+				logger.info("Restarting Application..")
+				Timer(2.0, self.restart).start()
+			else:
+				self.set_state(AppState.STATUS)
+
+		elif reason == TKSettings.CB_REBOOT:
+			self.message_window.clear()
+			self.message_window.add_message("Rebooting Device..")
+			self.set_state(AppState.MESSAGES)
+
+			logger.info("Rebooting Device..")
+			Timer(2.0, self.reboot).start()
+
+		elif reason == TKSettings.CB_RESET:
+			self.message_window.clear()
+			self.message_window.add_message("Clearing Wifi Credentials..")
+			self.set_state(AppState.MESSAGES)
+
+			logger.info("Clearing Wifi Credentials....")
+			Timer(2.0, self.reset_wifi).start()
+
+
 	# Button events
 	def click_onboard(self, nullArg=0):
 		logger.info("click_onboard")
@@ -227,10 +283,16 @@ class ProtoDPP(TKApp):
 	def click_cycle_wifi(self, nullArg=0):
 		self.cancel_animations()
 		logger.info("click_cycle_wifi")
+		self.message_window.clear()
+		self.message_window.add_message("Cycling wifi..")
+		self.set_state(AppState.MESSAGES)
+		logger.info("Cycling wifi..")
+		self.cycle_wifi()
 
 	def click_settings(self, nullArg=0):
 		self.cancel_animations()
 		logger.info("click_setting")
+		self.set_state(AppState.SETTINGS)
 
 	def click_power(self, nullArg=0):
 		self.cancel_animations()
@@ -257,7 +319,7 @@ class ProtoDPP(TKApp):
 			threading.Timer(1.0, self.main_timer).start()
 
 		except:
-		    pass
+			pass
 
 if __name__ == '__main__':
 	app = ProtoDPP()
