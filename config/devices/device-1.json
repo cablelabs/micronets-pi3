@@ -1,0 +1,9 @@
+{ 
+    "vendor" : "AcmeMeds",
+    "type" : "Heartrate Monitor",
+    "model" : "Heart-Assure",
+    "class" : "Medical",
+    "deviceConnection" : "wifi",
+    "deviceName" : "ProtoMed 2",
+    "modelUID64" : "BQ0LDQsMDAM"
+}

@@ -1,0 +1,9 @@
+#!/bin/bash
+# hopefully temporary script to remove onboarded device from micronets manager. Otherwise subsequent onboards will fail
+
+if [ ! -z $1 ]; then 
+	echo "usage ./clearsubscriber <host> (eg. micronets@192.168.0.22)"
+else
+	curl -X DELETE "https://mm-api.micronets.in/sub/$1/api/mm/v1/subscriber/$1/micronets"
+	date
+fi
