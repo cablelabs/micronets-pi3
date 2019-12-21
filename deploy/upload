@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [[ `basename $PWD` != 'deploy' ]]; then
+	echo "You must run this script from the directory where it lives (/deploy)"
+	exit
+fi
+
+if [ -z $1 ]; then 
+	echo "usage ./upload <host> (eg. micronets@192.168.0.22)"
+else
+	rsync --verbose --force --recursive ../python3 $1:~/proto-pi/
+
+	# For config, ignore existing files
+	rsync --verbose --force --recursive --ignore-existing ../config ../deploy $1:~/proto-pi/
+	#rsync --verbose --force --recursive ../networks $1:~/proto-pi/
+
+	date
+fi
+
+
+# TODO: Add separate script to install systemd services, lightdm startup files, /etc/micronets file system
+#rsync --verbose --force --rsync-path="sudo rsync" ~/github/micronets/micronets-pi3/install/init.d/protomed $HOST:/etc/init.d/

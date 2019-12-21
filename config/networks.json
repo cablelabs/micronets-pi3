@@ -1,0 +1,16 @@
+{
+	"default": {
+		"ssid": "\"visitors\"",
+		"psk": "\"rockymountain\"",
+		"key_mgmt": "WPA-PSK WPA-PSK-SHA256",
+		"ieee80211w": "1",
+		"priority": "-2"
+	},
+	"hotspot": {
+		"ssid": "\"micronets-hs\"",
+		"psk": "\"secblanket\"",
+		"key_mgmt": "WPA-PSK WPA-PSK-SHA256",
+		"ieee80211w": "1",
+		"priority": "-1"
+	}
+}

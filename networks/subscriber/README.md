@@ -1,1 +1,0 @@
-Subscriber wifi configuration files

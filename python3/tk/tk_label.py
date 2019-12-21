@@ -6,9 +6,7 @@ class TKLabel(TKWidget):
 
 	def __init__(self,parent,l, t, w, h, text, fg='white', font=TKWidget.font2, bg = None, show=True):
 
-		TKWidget.__init__(self)
-
-		self.parent = parent
+		TKWidget.__init__(self, parent)
 
 		self.frame = Label(parent.frame, text=text, fg=fg, font=font)
 		self.place_widget(self.frame, l, t, w, h, show)

@@ -4,17 +4,21 @@ from .tk_widget import TKWidget
 from .tk_icon import TKIcon
 from .tk_label import TKLabel
 
-import lib.wpa_supplicant as wpa_supplicant
+import utils.wpa_cli as wpa_cli
 import utils.globals as globals
 import utils.network as network
+from utils.config import config
+
+from utils.syslogger import SysLogger
+
+# Logfile is /tmp/<argv[0]>.log
+logger = SysLogger().logger()
 
 class TKStatus(TKWidget):
 
 	def __init__(self,parent,l=0, t=40, w=280, h=160, show=True):
 
-		TKWidget.__init__(self)
-
-		self.parent = parent
+		TKWidget.__init__(self, parent)
 
 		# main frame
 		self.frame = Frame(parent.frame, background="white", borderwidth=0, relief="solid")
@@ -66,9 +70,15 @@ class TKStatus(TKWidget):
 		#self.clear()
 		ssid = network.get_ssid()
 		wifi_ip = network.get_wifi_ipaddress()
-		is_provisioned = wpa_supplicant.has_network()
 
-		if ssid:
+		if config.get('mode') == 'dpp':
+			is_provisioned = wpa_cli.has_network()
+		else:
+			is_provisioned = wpa_cli.get_provisioned() != None
+
+		#logger.info("{} - is_provisioned: {}".format(config.get('mode'), is_provisioned))
+
+		if is_provisioned and ssid:
 			if not globals.sparse_mode:
 				self.set_ssid_text(ssid)
 			else:

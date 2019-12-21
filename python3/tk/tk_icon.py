@@ -8,9 +8,7 @@ class TKIcon(TKWidget):
 
 	def __init__(self,parent,l, t, w, h, imagename,show=True):
 
-		TKWidget.__init__(self)
-
-		self.parent = parent
+		TKWidget.__init__(self, parent)
 
 		image = None
 		icon = None

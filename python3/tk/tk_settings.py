@@ -7,7 +7,6 @@ from utils.config import config
 
 
 import utils.network as network
-import utils.wpa_supplicant as wpa_supplicant
 
 class TKSettings(TKWidget):
 
@@ -17,9 +16,8 @@ class TKSettings(TKWidget):
 
 	def __init__(self,parent, callback=None, l=0, t=40, w=280, h=160, show=False):
 
-		TKWidget.__init__(self)
+		TKWidget.__init__(self, parent)
 
-		self.parent = parent
 		self.callback = callback if callback else self.null_callback
 
 		self.frame = Frame(parent.frame, background='light goldenrod yellow', borderwidth=0, relief="solid")

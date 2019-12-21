@@ -10,9 +10,7 @@ class TKButton(TKWidget):
 
 	def __init__(self,parent,l, t, w, h, imagename, callback=None, callback2=None,show=True):
 
-		TKWidget.__init__(self)
-
-		self.parent = parent
+		TKWidget.__init__(self, parent)
 
 		image = None
 		icon = None
@@ -57,9 +55,8 @@ class TKTextButton(TKWidget):
 
 	def __init__(self,parent,l, t, w, h, text, callback, fg='black', font=TKWidget.font2, show=True):
 
-		TKWidget.__init__(self)
+		TKWidget.__init__(self, parent)
 
-		self.parent = parent
 		self.frame = Button(parent.frame, fg=fg, text=text, font=font)
 
 		if callback != None:

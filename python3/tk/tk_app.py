@@ -4,10 +4,13 @@ import threading
 from threading import Timer
 from tkinter import *
 from .tk_main import TKMain
-from utils.config import *
+from utils.config import config
 import pyscreenshot as ImageGrab
 import utils.globals as globals
 import utils.wpa_cli as wpa_cli
+
+# This will generate a key pair if one does not exist
+from utils.ecc_keys import ecc_keys
 
 from utils.syslogger import SysLogger
 logger = SysLogger().logger()
@@ -152,6 +155,9 @@ class TKApp():
 
 	def reboot(self):
 		os.popen("sudo reboot now")
+
+	def shutdown(self):
+		os.popen("sudo shutdown -h now")
 
 
 	# event handler to toggle the TFT backlight

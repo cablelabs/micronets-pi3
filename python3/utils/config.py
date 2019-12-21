@@ -7,19 +7,6 @@ __all__ = ["config"]
 # Logfile is /tmp/protodpp.log
 logger = SysLogger().logger()
 
-default_key = "MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgACDIBBiMf4W+tukQcNKz5eObkMp3tNPFJRvBhE1sop3K0="
-default_p256 = "30570201010420777fc55dc51e967c10ec051b91d860b5f1e6c934e48d5daffef98d032c64b170a00a06082a8648ce3d030107a124032200020c804188c7f85beb6e91070d2b3e5e39b90ca77b4d3c5251bc1844d6ca29dcad"
-default_vendor_code = "DAWG"
-default_channel = 1
-default_channel_class = 81
-default_mode = "dpp"
-default_countdown = 30
-# proxy settings are used when simulating the iphone mobile application (click on qrcode)
-default_proxy_mso_portal = "https://mso-portal-api.micronets.in"
-default_proxy_username = "grandma"
-default_proxy_password = "grandma"
-default_proxy_device_uid = "AgoNDQcDDgg"
-
 folder = os.path.dirname(os.path.realpath(__file__))
 filename = os.path.join(folder, '../../config/config.json')
 
@@ -28,8 +15,6 @@ class Config():
     def __init__(self):
 
         self.load_config()
-        logger.info("load_config:")
-        #logger.info(self.dump())
         self.set_defaults()
         self.save_config()
 
@@ -46,21 +31,30 @@ class Config():
     def set_defaults(self):
         # config defaults
         self.config_default('mode', 'dpp')
-        self.config_default('key', default_key)
-        self.config_default('p256', default_p256)
-        self.config_default('vendorCode', default_vendor_code)
-        self.config_default('channel', default_channel)
-        self.config_default('channelClass', default_channel_class)
-        self.config_default('countdown', default_countdown)
-        self.config_default('demo', True)
         self.config_default('splashAnimationSeconds', 10)
         self.config_default('onboardAnimationSeconds', 5)
         self.config_default('messageTimeoutSeconds', 45)
 
-        self.config_default(['dppProxy','msoPortalUrl'], default_proxy_mso_portal)
-        self.config_default(['dppProxy','username'], default_proxy_username)
-        self.config_default(['dppProxy','password'], default_proxy_password)
-        self.config_default(['dppProxy','deviceModelUID'], default_proxy_device_uid)
+        # clinic mode specific
+        self.config_default('registration_server', 'https://alpineseniorcare.com/micronets')
+        self.config_default('device_profile', 'device-0')
+
+        # dpp mode specific
+        self.config_default('key', "MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgACDIBBiMf4W+tukQcNKz5eObkMp3tNPFJRvBhE1sop3K0=")
+        self.config_default('p256', "30570201010420777fc55dc51e967c10ec051b91d860b5f1e6c934e48d5daffef98d032c64b170a00a06082a8648ce3d030107a124032200020c804188c7f85beb6e91070d2b3e5e39b90ca77b4d3c5251bc1844d6ca29dcad")
+        self.config_default('vendorCode', "DAWG")
+        self.config_default('channel', 1)
+        self.config_default('channelClass', 81)
+        self.config_default('qrcode_countdown', 30)
+        # proxy settings are used when simulating the iphone mobile application (click on qrcode)
+        self.config_default(['dppProxy','msoPortalUrl'], "https://mso-portal-api.micronets.in")
+        self.config_default(['dppProxy','username'], "grandma")
+        self.config_default(['dppProxy','password'], "grandma")
+        self.config_default(['dppProxy','deviceModelUID'], "AgoNDQcDDgg")
+
+        # customization flags
+        self.config_default('demo', True)
+        self.config_default('comcast', False)
 
     def load_config(self):
         try:

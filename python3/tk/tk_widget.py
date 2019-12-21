@@ -25,7 +25,8 @@ class TKWidget():
 	font4=("HelveticaNeue-Light", 18, 'normal')
 	font5=("HelveticaNeue-Light", 8, 'normal')
 
-	def __init__(self):
+	def __init__(self, parent):
+		self.parent = parent
 		self.frame = None
 		self.placements = {} # position/size of self and all children
 

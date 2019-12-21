@@ -3,15 +3,14 @@ from tkinter import *
 from .tk_widget import TKWidget
 
 import utils.network as network
-import utils.wpa_supplicant as wpa_supplicant
+import utils.wpa_cli as wpa_cli
 
 class TKMessages(TKWidget):
 
 	def __init__(self,parent,l=0, t=40, w=280, h=160, show=False):
 
-		TKWidget.__init__(self)
+		TKWidget.__init__(self, parent)
 
-		self.parent = parent
 		self.last_message_time = 0.0
 
 		self.frame = Text(parent.frame, wrap=WORD, background='white', borderwidth=0, highlightthickness=0, relief="solid")
@@ -40,7 +39,7 @@ class TKMessages(TKWidget):
 
 			ssid = network.get_ssid()
 			addr = network.get_wifi_ipaddress()
-			pwd  = wpa_supplicant.get_ssid_psk(ssid) if ssid else None
+			pwd  = wpa_cli.get_ssid_psk(ssid) if ssid else None
 
 			self.add_message("")
 			self.add_message("   SSID: "+ str(ssid))

@@ -8,9 +8,7 @@ class TKMain(TKWidget):
 
 	def __init__(self,parent,l, t, w, h, show):
 
-		TKWidget.__init__(self)
-
-		self.parent = parent
+		TKWidget.__init__(self, parent)
 
 		# main frame
 		self.frame = Frame(parent, background="gray80", borderwidth=0, relief="solid")

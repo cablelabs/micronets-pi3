@@ -1,6 +1,6 @@
 from tkinter import *
 from .tk_widget import TKWidget
-from utils.config import *
+from utils.config import config
 from PIL import Image, ImageTk
 import qrcode
 
@@ -8,9 +8,8 @@ class TKQRCode(TKWidget):
 
 	def __init__(self,parent,l=0, t=0, w=280, h=240, show=False):
 
-		TKWidget.__init__(self)
+		TKWidget.__init__(self, parent)
 
-		self.parent = parent
 		self.image = None
 		self.label = None
 

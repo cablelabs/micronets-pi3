@@ -18,9 +18,7 @@ class TKAnimation(TKWidget):
 
 	def __init__(self,parent, filename, duration, callback=None, preload=True, l=0, t=40, w=280, h=160, cancel_tap=True, show=False):
 
-		TKWidget.__init__(self)
-
-		self.parent = parent
+		TKWidget.__init__(self, parent)
 
 		# For this widget, we want a backing frame with a black background to eliminate any flicker
 		self.frame = Frame(parent.frame, bg='black')

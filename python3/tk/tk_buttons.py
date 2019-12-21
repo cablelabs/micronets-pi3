@@ -18,7 +18,7 @@ class TKButtons(TKWidget):
 
 	def __init__(self,parent,l=280, t=40, w=40, h=160, show=True):
 
-		TKWidget.__init__(self)
+		TKWidget.__init__(self, parent)
 
 		self.button_onboard = 0
 		self.button_cycle = 1
@@ -29,8 +29,6 @@ class TKButtons(TKWidget):
 		self.width = w
 		self.height = h
 		self.buttons = [None, None, None, None]
-
-		self.parent = parent
 
 		# main frame
 		self.frame = Label(parent.frame, fg="white", bg="gray80")

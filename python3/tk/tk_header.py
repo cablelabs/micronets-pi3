@@ -1,22 +1,20 @@
 from tkinter import *
 from .tk_widget import TKWidget
 from .tk_icon import TKIcon
-from utils.config import * 
+from utils.config import config
 
 class TKHeader(TKWidget):
 
 	def __init__(self, parent, mode, title, font, l=0, t=0, w=320, h=40, show=True):
 
-		TKWidget.__init__(self)
-
-		self.parent = parent
+		TKWidget.__init__(self, parent)
 
 		if mode == 'dpp':
 			bg = "DodgerBlue4"
-			icon = 'dpp3.png'
+			icon = 'dpp.png'
 		else:
 			bg = 'teal'
-			icon = 'clinic2.png'
+			icon = 'clinic.png'
 
 
 		# main frame
