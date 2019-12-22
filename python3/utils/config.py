@@ -63,7 +63,7 @@ class Config():
                 logger.info("config loaded OK: "+str(len(self.config))+ " keys")
                 #logger.info("\n" + json.dumps(config))
 
-        except (OSError, IOError, KeyError) as e: # FileNotFoundError does not exist on Python < 3.3
+        except (OSError, IOError, KeyError, FileNotFoundError) as e:
             logger.info("config load error: "+e)
             pass
 
