@@ -64,7 +64,7 @@ class Config():
                 #logger.info("\n" + json.dumps(config))
 
         except (OSError, IOError, KeyError, FileNotFoundError) as e:
-            logger.info("config load error: "+e)
+            logger.info("config load error: "+str(e)
             pass
 
     def dump(self, file=None):
