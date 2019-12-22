@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# onboard functionality for clinic demo
+
 import os, sys, time, traceback
 import json
 import requests

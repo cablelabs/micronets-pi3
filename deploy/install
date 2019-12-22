@@ -4,13 +4,22 @@
 # Installation script for proto-pi device
 #########################################################
 
+# useful tools
+# ssh
+# vnc
+
+adafruit-pitft.sh
+
+ssh authorized users
+
+
 # if not exists micronets group
 [ $(getent group micronets) ] || sudo groupadd micronets
 
 # Add user to required groups
 sudo usermod -a -G micronets, netdev, gpio
 
-# Add micronets to sudoers (no password for shutdown, restart lightdm, reboot, rsync)
+# Add micronets to sudoers (no password for shutdown, restart lightdm, reboot)
 sudo cp -f files/010_micronets /etc/sudoers.d
 
 # Add desktop startup files
@@ -19,7 +28,18 @@ cp -f files/proto-pi.desktop ~/.config/autostart
 # Build and install wpa_supplicant
 !TODO
 
-# Generate device public/private key pair
-!TODO
+# Install required python modules
 
 
+# Setup services 
+
+# wlan0 issues with two adapters?
+s
+
+
+#########################################################
+# Notes
+#########################################################
+#
+# - keypair is generated on first run.
+# - boilerplate config file is created on first run

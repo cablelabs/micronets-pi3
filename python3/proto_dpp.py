@@ -1,3 +1,4 @@
+# dpp variant of proto-pi demo
 import os, time, atexit
 import threading
 from threading import Timer

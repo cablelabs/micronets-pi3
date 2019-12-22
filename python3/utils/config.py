@@ -40,8 +40,6 @@ class Config():
         self.config_default('device_profile', 'device-0')
 
         # dpp mode specific
-        self.config_default('key', "MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgACDIBBiMf4W+tukQcNKz5eObkMp3tNPFJRvBhE1sop3K0=")
-        self.config_default('p256', "30570201010420777fc55dc51e967c10ec051b91d860b5f1e6c934e48d5daffef98d032c64b170a00a06082a8648ce3d030107a124032200020c804188c7f85beb6e91070d2b3e5e39b90ca77b4d3c5251bc1844d6ca29dcad")
         self.config_default('vendorCode', "DAWG")
         self.config_default('channel', 1)
         self.config_default('channelClass', 81)
@@ -76,6 +74,7 @@ class Config():
             with open(file, 'w') as outfile:  
                 json.dump(self.config, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
+    # get/set methods are recursive
     def set(self, key, value, dictionary=None):
 
         if not dictionary:

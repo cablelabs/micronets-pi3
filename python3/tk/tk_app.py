@@ -1,3 +1,5 @@
+# base class for proto-pi apps
+
 import os, sys, time
 import datetime
 import threading

@@ -1,3 +1,5 @@
+# wrapper for communicating with wpa_supplicant via wpa_cli
+# To run without sudo requires adding netdev group
 import os, sys
 from .config import *
 from .syslogger import SysLogger

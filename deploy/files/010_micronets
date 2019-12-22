@@ -1,4 +1,3 @@
-#micronets ALL=NOPASSWD: /usr/bin/rsync
 micronets ALL=NOPASSWD: /sbin/reboot
 micronets ALL=NOPASSWD: /sbin/shutdown
 micronets ALL=NOPASSWD: /bin/systemctl restart lightdm
