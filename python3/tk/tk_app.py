@@ -67,7 +67,7 @@ class TKApp():
 		self.backlight.start(100)
 
 		# Temp for development, using VNC and don't need screen on
-		self.toggle_backlight()
+		#self.toggle_backlight()
 
 		# Overload in derived classes
 		self.dispatch = {}

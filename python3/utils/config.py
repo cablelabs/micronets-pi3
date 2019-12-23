@@ -63,8 +63,11 @@ class Config():
                 logger.info("config loaded OK: "+str(len(self.config))+ " keys")
                 #logger.info("\n" + json.dumps(config))
 
-        except (OSError, IOError, KeyError, FileNotFoundError) as e:
-            logger.info("config load error: "+str(e)
+        except (KeyError, FileNotFoundError) as e:
+            logger.info("config load error")
+
+            # Start empty, create boilerplate from defaults.
+            self.config = {}
             pass
 
     def dump(self, file=None):
