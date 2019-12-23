@@ -6,6 +6,9 @@ sudo mkdir -p /usr/local/images
 # set current dir to where this script lives
 pushd "${0%/*}" > /dev/null
 
+# this folder should exist but doesn't out of the box.
+sudo mkdir -p /usr/lib/systemd/system-shutdown
+
 #### Splash screen service ####
 echo "*** Configuring splash screen service ***"
 sudo cp -f ../../splash.png  /usr/local/images/
