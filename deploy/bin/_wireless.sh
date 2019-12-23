@@ -19,3 +19,4 @@ then
         sudo echo "dtoverlay=pi3-disable-wifi" >> /boot/config.txt
     fi
 fi
+

@@ -3,6 +3,8 @@
 
 mkdir -p ~/.config/autostart
 
+echo "*** Creating desktop autostart file ***" 
+
 desktop_file=~/.config/autostart/proto-pi.desktop
 
 echo "[Desktop Entry]" > $desktop_file
