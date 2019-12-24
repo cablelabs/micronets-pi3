@@ -21,7 +21,7 @@ echo "\nYou can enable VNC server by running 'sudo raspi-config' (recommended)\n
 
 # Add user to required groups
 echo "*** Adding user $USER to groups: netdev, gpio ***" 
-sudo usermod -a -G netdev, gpio $USER
+sudo usermod -a -G netdev,gpio $USER
 
 # Create desktop autostart shortcut
 ./bin/_desktop.sh
