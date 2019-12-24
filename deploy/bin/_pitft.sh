@@ -32,7 +32,7 @@ chmod a+x adafruit-pitft.sh
 
 # run non-interactively
 echo "fetching pitft configuration script"
-cat pitft_defaults | sudo ./adafruit-pitft.sh
+cat pitft_defaults | sudo -H ./adafruit-pitft.sh
 
 # cleanup
 rm pitft_defaults
