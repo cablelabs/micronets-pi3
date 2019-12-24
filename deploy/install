@@ -7,9 +7,6 @@ pushd "${0%/*}" > /dev/null
 # Installation script for proto-pi device
 #########################################################
 
-# PiTFT screen configuration
-./bin/_pitft.sh
-
 # sudo privileges required by proto-pi
 ./bin/_sudoers.sh
 
@@ -28,6 +25,9 @@ sudo usermod -a -G netdev,gpio $USER
 
 # Disable onboard wifi adapter
 sudo ./bin/_wireless.sh
+
+# PiTFT screen configuration
+#./bin/_pitft.sh
 
 # Build and install wpa_supplicant
 #./bin/_wpa_supplicant.sh
