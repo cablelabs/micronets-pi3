@@ -15,8 +15,9 @@ then
         echo "Already configured (/boot/config.txt)"
     else
         echo "Disabling onboard wifi  (/boot/config.txt)"
-        sudo user=root echo "# Disable onboard wifi adapter (using external adapter)"  >> /boot/config.txt
-        sudo user=root echo "dtoverlay=pi3-disable-wifi" >> /boot/config.txt
+        sudo echo ""  >> /boot/config.txt
+        sudo echo "# Disable onboard wifi adapter (using external adapter)"  >> /boot/config.txt
+        sudo echo "dtoverlay=pi3-disable-wifi" >> /boot/config.txt
     fi
 fi
 

@@ -24,7 +24,8 @@ sudo usermod -a -G netdev,gpio $USER
 ./bin/_services.sh
 
 # Disable onboard wifi adapter
-./bin/_wireless.sh
+# (not sure why sudo is required here, sudo present for commands in script)
+sudo ./bin/_wireless.sh
 
 # PiTFT screen configuration
 ./bin/_pitft.sh
@@ -32,7 +33,7 @@ sudo usermod -a -G netdev,gpio $USER
 # Build and install wpa_supplicant
 ./bin/_wpa_supplicant.sh
 
-# TODO prompt for restart
+# Restart?
 read -r -p "Reboot Now? [y/N] " response
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
 then
