@@ -7,12 +7,6 @@ pushd "${0%/*}" > /dev/null
 # Installation script for proto-pi device
 #########################################################
 
-echo "*** Enabling SSH ***" 
-sudo systemctl enable ssh
-sudo systemctl start ssh
-
-echo "\nYou can enable VNC server by running 'sudo raspi-config' (recommended)\n"
-
 # PiTFT screen configuration
 ./bin/_pitft.sh
 
@@ -26,9 +20,6 @@ sudo usermod -a -G netdev,gpio $USER
 # Create desktop autostart shortcut
 ./bin/_desktop.sh
 
-# Build and install wpa_supplicant
-./bin/_wpa_supplicant.sh
-
 # Install required python modules
 ./bin/_pip3.sh
 
@@ -36,7 +27,10 @@ sudo usermod -a -G netdev,gpio $USER
 ./bin/_services.sh
 
 # Disable onboard wifi adapter
-./bin/_wireless.sh
+sudo ./bin/_wireless.sh
+
+# Build and install wpa_supplicant
+#./bin/_wpa_supplicant.sh
 
 # TODO prompt for restart
 
