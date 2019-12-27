@@ -11,7 +11,7 @@ sudo mkdir -p /usr/lib/systemd/system-shutdown
 
 #### Splash screen service ####
 echo "*** Configuring splash screen service ***"
-sudo cp -f ../../splash.png  /usr/local/images/
+sudo cp -f ../files/splash.png  /usr/local/images/
 service_file=/etc/systemd/system/splashscreen.service
 sudo cp -f ../files/splashscreen.service $service_file
 sudo systemctl enable $service_file
@@ -23,7 +23,7 @@ sudo chmod a+x $script_file
 
 #### Goodbye screen service ####
 echo "*** Configuring goodbye screen service ***"
-sudo cp -f ../../goodbye.png  /usr/local/images/
+sudo cp -f ../files/goodbye.png  /usr/local/images/
 service_file=/usr/lib/systemd/system-shutdown/goodbyescreen.service
 sudo cp -f ../files/goodbyescreen.service $service_file
 sudo systemctl enable $service_file

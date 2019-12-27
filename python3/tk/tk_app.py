@@ -14,10 +14,13 @@ import utils.wpa_cli as wpa_cli
 # This will generate a key pair if one does not exist
 from utils.ecc_keys import ecc_keys
 
+# Logfile is /tmp/<argv[0]>.log
 from utils.syslogger import SysLogger
 logger = SysLogger().logger()
 
 import RPi.GPIO as GPIO
+
+gpio_pins = [17, 22, 23, 27]
 
 class TKApp():
 
@@ -78,6 +81,17 @@ class TKApp():
 		self.standard_buttons = []
 		self.all_buttons = []
 
+		# default button callbacks. Override with callbacks in derived apps
+		def button_callback(pin):
+			if GPIO.input(pin):
+				logger.info("GPIO button {} released".format(pin))
+			else:
+				logger.info("GPIO button {} pressed".format(pin))
+
+		self.hardware_button(0, button_callback)
+		self.hardware_button(1, button_callback)
+		self.hardware_button(2, button_callback)
+		self.hardware_button(3, button_callback, button_callback)
 
 	def run(self):
 
@@ -86,7 +100,6 @@ class TKApp():
 			self.canExit  = True
 
 		threading.Timer(10.0, enableExit).start()
-
 		self.window.mainloop()
 
 		#while 1:
@@ -102,7 +115,38 @@ class TKApp():
 		control.bind("<ButtonRelease-1>",callback)
 
 
-	# common functions for all proto applications
+	### common functions for all proto applications ###
+
+	# Map GPIO buttons.
+	# - callback: press
+	# - callback2: release (optional)
+	# Indexes (typical, but can be repurposed by derived app)
+	# 0: Onboard
+	# 1: Cycle Wifi
+	# 2: Settings
+	# 3: Power (restart, hold to reboot)
+	def hardware_button(self, index, callback, callback2=None):
+		# PiTFT button GPIO pins
+		pin = gpio_pins[index]
+
+		# release any existing binding
+		try:
+			GPIO.remove_event_detect(pin)
+		except:
+			pass
+			
+		if callback and callback2:
+			callback_both = self.trigger_both(pin, callback, callback2)
+			GPIO.add_event_detect(pin, GPIO.BOTH, callback=callback_both, bouncetime=200)
+		elif callback:
+			GPIO.add_event_detect(pin, GPIO.FALLING, callback=callback, bouncetime=200)
+		else:
+			GPIO.add_event_detect(pin, GPIO.RISING, callback=callback2, bouncetime=200)
+
+	# Create lambda to handle both rising and falling triggers/callbacks
+	def trigger_both( self, pin, c1, c2):
+		return lambda pin: c2(pin) if GPIO.input(pin) else c1(pin)
+
 
 	# Update user interface for new state and initialize as required
 	def set_state(self, new_state):

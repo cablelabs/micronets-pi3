@@ -4,7 +4,7 @@ from .syslogger import SysLogger
 
 __all__ = ["config"]
 
-# Logfile is /tmp/protodpp.log
+# Logfile is /tmp/<argv[0]>.log
 logger = SysLogger().logger()
 
 folder = os.path.dirname(os.path.realpath(__file__))
@@ -36,19 +36,24 @@ class Config():
 		self.config_default('messageTimeoutSeconds', 45)
 
 		# clinic mode specific
-		self.config_default('registration_server', 'https://alpineseniorcare.com/micronets')
-		self.config_default('device_profile', 'device-0')
+		self.config_default('registrationServer', 'https://alpineseniorcare.com/micronets')
+		self.config_default('deviceProfile', 'device-0')
 
 		# dpp mode specific
 		self.config_default('vendorCode', "DAWG")
 		self.config_default('channel', 1)
 		self.config_default('channelClass', 81)
-		self.config_default('qrcode_countdown', 30)
+		self.config_default('qrcodeCountdown', 30)
+		# don't provide defaults here. Will generate from modelUID if necessary
+		#self.config_default('dppMUDUrl', "https://myMudUrl")
+		self.config_default('dppName', "myDevice")
+		self.config_default('deviceModelUID', "AgoNDQcDDgg")
+
 		# proxy settings are used when simulating the iphone mobile application (click on qrcode)
 		self.config_default(['dppProxy','msoPortalUrl'], "https://mso-portal-api.micronets.in")
 		self.config_default(['dppProxy','username'], "grandma")
 		self.config_default(['dppProxy','password'], "grandma")
-		self.config_default(['dppProxy','deviceModelUID'], "AgoNDQcDDgg")
+		self.config_default('disableMUD', False)
 
 		# customization flags
 		self.config_default('demo', True)

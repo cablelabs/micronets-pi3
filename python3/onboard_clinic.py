@@ -15,7 +15,7 @@ import utils.wpa_cli as wpa_cli
 import utils.network as network
 from utils.ecc_keys import ecc_keys
 
-# Logfile is /tmp/protodpp.log
+# Logfile is /tmp/<argv[0]>.log
 logger = SysLogger().logger()
 
 # Subscriber certs directory
@@ -75,7 +75,7 @@ def __cancel__(callback, messages):
 
 # Load device profile
 def load_device():
-	profile = config.get("device_profile")
+	profile = config.get("deviceProfile")
 	folder = os.path.dirname(os.path.realpath(__file__))
 	filename = os.path.join(folder, '../config/devices/'+profile+'.json')
 
@@ -199,7 +199,7 @@ def save_credentials(credentials, callback, messages):
 	return True
 
 def make_url(path):
-	base_url = config.get("registration_server")
+	base_url = config.get("registrationServer")
 	url = "{}/{}".format(base_url, path)
 	return url
 

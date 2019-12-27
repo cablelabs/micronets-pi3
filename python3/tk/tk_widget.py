@@ -1,14 +1,11 @@
-
 # Base class for all of our UI elements
 from tkinter import *
+import os, sys
 
-# !! This requires a symlink utils -> ../utils, python 2.7 cannot do sibling folder imports. 
+# Logfile is /tmp/<argv[0]>.log
 from utils.syslogger import SysLogger
 logger = SysLogger().logger()
 
-import os, sys
-#import PIL.Image
-#import PIL.ImageTk
 
 class Placement:
 	def __init__(self, x, y, width, height):
@@ -53,44 +50,8 @@ class TKWidget():
 		if self.frame.winfo_ismapped():
 			self.hide_widget(self.frame)
 
-	'''
-	def add_icon(self, imagename, x, y, width, height, show=True):
-		path = os.path.abspath(os.path.join(os.path.dirname(__file__),'../images', imagename))
-		img = PIL.Image.open(path)
-		img = img.resize((width, height),PIL.Image.ANTIALIAS)
-		icon = PIL.ImageTk.PhotoImage(img)
-		iconFrame = Label(self.frame, image=icon)
-		self.place_widget(iconFrame, x, y, width, height, show)
-		iconFrame['bg'] = self.frame['bg']
-		iconFrame.saveicon = icon   # otherwise it disappears
-		return iconFrame
-	'''
 	def register_click(self, callback):
 		self.frame.bind("<Button-1>",callback)
 
 	def register_click_release(self, callback):
 		self.frame.bind("<ButtonRelease-1>",callback)
-
-	'''
-	def add_button(self, l, t, w, h, imagename, callback, callback2=None, show=True):
-		logger.info("add_button (top): "+str(t))
-		image = None
-		icon = None
-		if imagename != None:
-			icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'../images', imagename))
-			img = PIL.Image.open(icon_path)
-			img = img.resize((w,h),PIL.Image.ANTIALIAS)
-			icon = PIL.ImageTk.PhotoImage(img)
-			button = Label(self.frame, image=icon)
-		else:
-			button = Label(self.frame)
-
-		button.bind("<Button-1>",callback)
-		if callback2 != None:
-			button.bind("<ButtonRelease-1>",callback2)
-
-		self.place_widget(button, l, t, w, h, show)
-		button['bg'] = self.frame['bg']
-		button.saveicon = icon   # otherwise it disappears
-		return button
-	'''

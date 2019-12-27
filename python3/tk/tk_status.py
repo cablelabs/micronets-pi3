@@ -40,18 +40,12 @@ class TKStatus(TKWidget):
 		self.not_connected_icon.hide()
 		self.ssid_label.set_text("")
 
-	# MAYBE: change TKWidget show/hide to check winfo_ismapped()
-	# only change icons if status changed (avoid flicker)
 	def set_connected(self, connected):
 		if connected:
-			#if not self.connected_icon.frame.winfo_ismapped():
 			self.connected_icon.show()
-			#if self.not_connected_icon.frame.winfo_ismapped():
 			self.not_connected_icon.hide()
 		else:
-			#if self.connected_icon.frame.winfo_ismapped():
 			self.connected_icon.hide()
-			#if not self.not_connected_icon.frame.winfo_ismapped():
 			self.not_connected_icon.show()
 
 	# only change text if status changed (avoid flicker)
@@ -61,13 +55,6 @@ class TKStatus(TKWidget):
 
 	def update(self):
 
-		#self.connected_icon.show()
-		#self.not_connected_icon.show()
-		#self.ssid_label.set_text("flerb")
-
-		#return
-
-		#self.clear()
 		ssid = network.get_ssid()
 		wifi_ip = network.get_wifi_ipaddress()
 
@@ -75,8 +62,6 @@ class TKStatus(TKWidget):
 			is_provisioned = wpa_cli.has_network()
 		else:
 			is_provisioned = wpa_cli.get_provisioned() != None
-
-		#logger.info("{} - is_provisioned: {}".format(config.get('mode'), is_provisioned))
 
 		if is_provisioned and ssid:
 			if not globals.sparse_mode:

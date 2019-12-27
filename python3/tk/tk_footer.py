@@ -25,15 +25,3 @@ class TKFooter(TKWidget):
 
 	def update():
 		pass
-
-	'''
-		TODO: based on parent.state & globals.sparse_mode, choose what to show
-			            #if not self.sparse_mode:
-		                #footer.config(text=str(wifi_ip))
-		                
-
-		            if not config.get('comcast'):
-		            	
-		                #footer.config(text="NO IP ADDRESS")
-	'''
-

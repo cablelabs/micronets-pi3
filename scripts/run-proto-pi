@@ -1,2 +1,0 @@
-cd ~/proto-pi/python3
-/usr/bin/python3 proto_pi.py &

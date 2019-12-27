@@ -14,7 +14,7 @@ def get_wifi_ipaddress():
 	return ipaddress
 
 def get_ethernet_ipaddress():
-	fields = os.popen("ifconfig "+interface+" | grep 'inet '").read().strip().split(" ")
+	fields = os.popen("ifconfig eth0 | grep 'inet '").read().strip().split(" ")
 	ipaddress = None
 	if len(fields) >= 2:
 		ipaddress = fields[1]

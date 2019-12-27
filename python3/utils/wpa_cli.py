@@ -43,6 +43,9 @@ def reconfigure():
 def reassociate():
 	exec_cli("reassociate")
 
+def set(param, value):
+	exec_cli("set {} {}".format(param,value), 0, False)
+
 def list_networks():
 	lines = exec_cli("list_networks", 2, False)
 	return lines

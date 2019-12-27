@@ -32,7 +32,6 @@ class TKButtons(TKWidget):
 
 		# main frame
 		self.frame = Label(parent.frame, fg="white", bg="gray80")
-		#self.place_widget(self.frame,layout, show)
 		self.place_widget(self.frame,l, t, w, h, show)
 
 	def add_button(self, index, imagename, callback, callback2=None, show=True):

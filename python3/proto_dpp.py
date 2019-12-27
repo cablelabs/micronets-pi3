@@ -1,15 +1,16 @@
 # dpp variant of proto-pi demo
 import os, time, atexit
-import threading
+import threading, requests
 from threading import Timer
 from enum import Enum
+import json
 
 from utils.syslogger import SysLogger
 from utils.config import config
 import utils.globals as globals
 import utils.network as network
 import utils.wpa_cli as wpa_cli
-import utils.ecc_keys as ecc_keys
+from utils.ecc_keys import ecc_keys
 import pyscreenshot as ImageGrab
 
 from tkinter import *
@@ -23,6 +24,9 @@ from tk.tk_qrcode import TKQRCode
 from tk.tk_messages import TKMessages
 from tk.tk_settings import TKSettings
 from tk.tk_animation import TKAnimation
+
+
+import http.client 
 
 # TODO: 
 #   -  Implement utils/layouts.py instead of passing l,t,w,h in widget constructors
@@ -101,13 +105,18 @@ class ProtoDPP(TKApp):
 		self.shutdown_button = self.buttons_window.add_button(3, 'shutdown.png', self.click_power, self.release_power)
 		self.countdown_button.set_text("", "white", TKWidget.font1)
 
+		# Hardware buttons
+		self.hardware_button(0, self.click_onboard)
+		self.hardware_button(1, self.click_cycle_wifi)
+		self.hardware_button(2, self.click_settings)
+		self.hardware_button(3, self.click_power, self.release_power)
+
 		# QRCode
 		self.qrcode_window = TKQRCode(self.main_window)
 
 		# Animations
 		self.splash_window = TKAnimation(self.main_window, 'earth.gif', 6, self.splash_end_event)
 		self.fireworks_window = TKAnimation(self.main_window, 'fireworks.gif', 2, self.fireworks_end_event)
-		#self.wait_window = TKAnimation(self.main_window, 'loading.gif', 2, self.wait_end_event)
 
 		## UI state management ##
 
@@ -170,9 +179,19 @@ class ProtoDPP(TKApp):
 	def display_splash(self):
 		logger.info("display splash")
 		self.splash_window.start()
+		try:
+			ethernet_ip = network.get_ethernet_ipaddress()
+			if ethernet_ip:
+				self.footer_window.set_text(ethernet_ip)
+				if not config.get('disableMUD'):
+					self.register_mud_url()
+		except Exception as e:
+			logger.error("register_mud_url: {}".format(e))
+			pass
 
 	def end_splash(self):
 		logger.info("end splash")
+		self.footer_window.set_text("")
 		self.splash_window.unload()
 
 	def display_status(self):
@@ -180,12 +199,42 @@ class ProtoDPP(TKApp):
 		self.update_status()
 
 	def display_qrcode(self):
+		if not config.get('disableMUD'):
+			self.dpp_params()
 		self.reset_wifi()
 		uri = wpa_cli.dpp_bootstrap_gen(network.get_mac())
 		self.qrcode_window.generate(uri)
 		wpa_cli.dpp_listen()
 		self.cancel_qrcode = False
-		self.qrc_counter = 10
+		self.qrc_counter = config.get("qrcodeCountdown", 30)
+
+	# set dpp params that will be exchanged with the configurator during onboarding
+	def dpp_params(self):
+		wpa_cli.set('dpp_name',config.get('dppName'))
+		mud_url = config.get('dppMudUrl')
+		if not mud_url:
+			vendor = config.get('vendorCode')
+			model_id = config.get('deviceModelUID')
+			mud_url = "https://registry.micronets.in/mud/v1/model/mud-url/{}/{}".format(vendor, model_id)
+		wpa_cli.set('dpp_mud_url', mud_url)
+
+	# update our mud registry on startup if we have an ethernet connection and user hasn't configured an explicit mud_url.
+	def register_mud_url(self):
+		if network.get_ethernet_ipaddress():
+			mud_url = config.get('dppMudUrl')
+			if not mud_url:
+				logger.info("registering device")
+				vendor = config.get('vendorCode')
+				model_id = config.get('deviceModelUID')
+				pub_key = ecc_keys.public_key_dpp
+				url = "https://registry.micronets.in/mud/v1/register-device/{}/{}/{}".format(vendor, model_id, pub_key)
+				response = requests.post(url, allow_redirects=False)
+				if response.status_code == 301:
+					response = requests.post(response.headers['Location'])
+				if response.status_code == 200:
+					logger.info("Device registered")
+				else:
+					logger.error("Failed to register device: {}".format(response.status_code))
 
 	def end_qrcode(self):
 		logger.info("end_qrcode")
@@ -209,15 +258,11 @@ class ProtoDPP(TKApp):
 
 	def cycle_wifi(self):
 		wpa_cli.reconfigure()
-		#wpa_cli.reassociate()
-
 		Timer(2.0, self.set_state,[AppState.STATUS]).start()
 
 
 	# Timer events
 	def qrcode_timer_event(self):
-
-		#logger.info("qrcode timer")
 
 		self.countdown_button.set_text(str(self.qrc_counter))
 		self.qrc_counter -= 1
@@ -340,31 +385,20 @@ class ProtoDPP(TKApp):
 	def main_timer(self):
 
 		try:
+
 			# check for change in wifi connection
-			# if self.state == AppState.STATUS, changes will be reflected in UI
-			self.update_status()
+			if self.state == AppState.STATUS or self.state == AppState.MESSAGES:
+				self.update_status()
 
 			if self.state == AppState.QRCODE:
 				self.qrcode_timer_event()
 
 			threading.Timer(2.0, self.main_timer).start()
 
-		except:
+		except Exception as e:
+			logger.info("timer exception: {}".format(e))
 			pass
 
 if __name__ == '__main__':
 	app = ProtoDPP()
 	app.run()
-
-'''
-		count = 0
-		def updateTimer():
-			global count
-			window.after(4000,updateTimer)
-			if count == 1:
-				pass
-				status_frame.hide()
-			count += 1
-
-		updateTimer()
-'''

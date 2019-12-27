@@ -14,7 +14,7 @@ from subprocess import call
 from utils.syslogger import SysLogger
 
 
-# Logfile is /tmp/protodpp.log
+# Logfile is /tmp/<argv[0]>.log
 logger = SysLogger().logger()
 
 
@@ -68,25 +68,26 @@ def exec_dpp_onboard_proxy(config, mac, dpp_uri, display):
 	display.add_message("Session established")
 
 	# Get MUD
-	#curl -L "https://registry.micronets.in/mud/v1/mud-file/DAWG/MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgACDIBBiMf4W+tukQcNKz5eObkMp3tNPFJRvBhE1sop3K0="
-	url = "https://registry.micronets.in/mud/v1/mud-file/{}/{}".format(vendor_code, pubkey)
+	if not config.get('disableMUD'):
+		#curl -L "https://registry.micronets.in/mud/v1/mud-file/DAWG/MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgACDIBBiMf4W+tukQcNKz5eObkMp3tNPFJRvBhE1sop3K0="
+		url = "https://registry.micronets.in/mud/v1/mud-file/{}/{}".format(vendor_code, pubkey)
 
-	logger.info("MUD: " + url)
+		logger.info("MUD: " + url)
 
-	response = session.get(url)
+		response = session.get(url)
 
-	if response.status_code != 200:
-		display.add_message("Get MUD failed")
-		return
+		if response.status_code != 200:
+			display.add_message("Get MUD failed")
+			return
 
-	display.add_message("MUD file retrieved")
-	reply = response.json()
+		display.add_message("MUD file retrieved")
+		reply = response.json()
 
-	mfg_name = reply["ietf-mud:mud"]["mfg-name"]
-	device_model = reply["ietf-mud:mud"]["model-name"]
-	device_class = reply["ietf-mud:mud"]["ietf-mud-micronets:class-name"]
-	device_type = reply["ietf-mud:mud"]["ietf-mud-micronets:type-name"]
-	device_name = device_model
+		mfg_name = reply["ietf-mud:mud"]["mfg-name"]
+		device_model = reply["ietf-mud:mud"]["model-name"]
+		device_class = reply["ietf-mud:mud"]["ietf-mud-micronets:class-name"]
+		device_type = reply["ietf-mud:mud"]["ietf-mud-micronets:type-name"]
+		device_name = device_model
 
 	# Onboard
 	display.add_message("Begin Onboard")

@@ -1,22 +1,15 @@
 #!/bin/bash
 
-if [[ `basename $PWD` != 'deploy' ]]; then
-	echo "You must run this script from the directory where it lives (/deploy)"
-	exit
-fi
+# This script is just for updating the python files remotely while developing
+# Ultimately you should check in your changes and 'git pull' from the device
+
+thisdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+pushd $thisdir > /dev/null
 
 if [ -z $1 ]; then 
-	echo "usage ./upload <host> (eg. micronets@192.168.0.22)"
+	echo "usage ./upload <host> (eg. pi@192.168.0.xx)"
 else
-	rsync --verbose --force --recursive ../python3 $1:~/proto-pi/
-
-	# For config, ignore existing files
-	rsync --verbose --force --recursive --ignore-existing ../config ../deploy $1:~/proto-pi/
-	#rsync --verbose --force --recursive ../networks $1:~/proto-pi/
-
+	rsync --verbose --force --recursive ../python3 $1:~/micronets-pi3/
 	date
 fi
-
-
-# TODO: Add separate script to install systemd services, lightdm startup files, /etc/micronets file system
-#rsync --verbose --force --rsync-path="sudo rsync" ~/github/micronets/micronets-pi3/install/init.d/protomed $HOST:/etc/init.d/

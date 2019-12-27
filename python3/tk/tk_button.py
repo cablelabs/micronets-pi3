@@ -4,8 +4,6 @@ from .tk_widget import TKWidget
 from PIL import Image
 from PIL import ImageTk
 
-#from utils.config import * 
-
 class TKButton(TKWidget):
 
 	def __init__(self,parent,l, t, w, h, imagename, callback=None, callback2=None,show=True):

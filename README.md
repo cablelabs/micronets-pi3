@@ -1,208 +1,115 @@
-# Protomed Device Installation and Configuration
+# Proto-Pi Installation and Configuration
 
-This code runs on a Raspberry Pi Zero Wifi, with the following components attached:
+The Proto-Pi is a general purpose iOT prototype device that can easily be modified to suit your needs. A python3/Tkinter application, it provides the following:
+ - UI with Touchscreen
+ - 4 hardware GPIO buttons
+ - Network connectivity, both ethernet and wifi
+ - Linux environment
+ - DPP enabled onboarding (with the Alfa adapter)
+It includes a Tkinter base class for the application, and widget wrappers to make UI management easy. 
 
- - OLED 128x128 display
- - Power Switch
- - Function Switch (advertise/cancel)
- - Power LED
- - Function LED (Slow blink = Onboarding in progress, Fast blink = Reset in progress, On = Onboarded, Off = Reset )
- - Reset Switch - Removes subscriber credentials and reconfigures wpa-supplicant to only connect to default network (clinic)
- - Mode Switch - Sets the onboard functionality to be either "clinic" or "DPP". DPP simply scans a qrcode and sends it to the micronets-dpp-server
- - Battery - Will last around an hour I think. 
- - Charge circuit - Allows for running on power adapter and charging battery
+This code runs on a Raspberry Pi 3B+, with the following components:
 
- [User Manual](https://github.com/cablelabs/micronets-pi/wiki/ProtoMed-User-Manual)
+ - [PiTFT 320x240 Capacitive Touchscreen](https://www.adafruit.com/product/2423)
+ - [PiTFT Faceplate and buttons kit](https://www.adafruit.com/product/2807)
+ - [Pi 3 Matching Case](https://www.adafruit.com/product/2253)
+ - [Alfa AWUS036NHA External USB Adapter](https://www.amazon.com/gp/product/B004Y6MIXS/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) (Required for DPP operation)
 
 Note: THIS APPLICATION REQUIRES PYTHON 3.5+!!
 
 ## Repository Layout
- - config - 
- - install - Upload script and startup files
+ - config - Application settings
+ - deploy - Installation scripts
  - python3 - Source code
- 	- lib - Cryptography and wpa-supplicant modules
- 	- utils - Utility code
- - device - physical device information
- - networks - network configuration stanzas for wpa_supplicant.conf (clinic mode only)
- - screenshots - destination folder when pulling screenshots from device
- - services - systemd service files to be installed on Pi
+ 	- tk - Tkinter GUI component wrappers
+ 	- utils - Supporting modules
+ 	- images - Application images
+ 	- tools - command line python scripts
+ - scripts - Useful tools
 
-## Device File System
-The install location is `/etc/micronets`
+## Installation
 
- - config - Device information used to advertise device
- - python3 - Source code
+#### Installer actions:
+ - Install and configure the PiTFT display
+ - Install build prerequisites for wpa_supplicant
+ - Build and install wpa_supplicant from micronets-hostap
+ - Disable onboard wifi (optional, y/N prompt)
+ - Create an auxilliary sudoers file for shutdown, reboot, and restarting the desktop
+ - Create a lightdm desktop entry to autostart the python app
+ - Install all python modules required by the app
+ - Install system services (boot/shutdown splash screens)
+ - Disable factory wpa_supplicant service (/sbin)
+ - Add current user to gpio and netdev groups
+
+#### Installer notes:
+ - The unstaller can be run successively to pull in updates from micronets-hostap
+ - Application is updated with a `git pull`
+ - A key pair that works for both clinic and DPP is created on first run
+ - A default application configuration file is generated on first run
+ - Application is run as user (no sudo required)
+ - All code/files live in user directory except installed services and wpa_supplicant.conf
+ - A Raspbian (buster) image is available/recommended for this install that has:
+   + support for the new Pi 4
+   + ssh & vnc enabled
+   + pi password changed to `micronets`
+   + vim installed
+   + all system updates installed
+   + desktop initialization run (timezone, language, keyboard, etc)
+
+#### Installation instructions:
+ - Download and burn raspbian image onto SD card:
+   https://www.dropbox.com/s/37ygauo02ltxirf/raspbian-buster-ssh-updates.zip?dl=0
+ - You'll need to figure out the ethernet ipaddress
+ - ssh pi@[ipaddress] (password is micronets)
+ - optionally create/use a different user account
+
+ Then, from the user home directory:
+ ```
+ #
+ cd ~
+ git clone https://git@github.com/cablelabs/micronets-pi3.git
+ cd micronets-pi3/deploy
+ ./install
+ # (take default prompts and reboot)
+```
+## Configuration
+A default configuration file (`config/config.json`) is generated on first run, which can be subsequently edited. It will not be overwritten when pulling from the repo.
+#### Clinic Mode Settings
+You will need to edit `config/networks.json` for the default networks to be provisioned and restored on reset.
+In the `config/devices` folder are several device profiles to choose from. The selection is made in `config/config.json`. The default is `device-0`
 
 ## Runtime environment
-This application is run full screen on the PiTFT device (320x240) and is a TKinter application that runs on the desktop (lightdm). The application is started when the desktop is started, and the following files are required.
+This application is run full screen on the PiTFT device (320x240) and is a TKinter application that runs on the desktop (lightdm), using the desktop configuration file `~/.config/autostart/protodpp.desktop`
+It runs in user space and does not require **sudo**. It gets its required privileges from membership in the `gpio` and `netdev` groups and from sudoer privileges for `shutdown, reboot, and restarting the desktop`.
 
-- ~/.config/autostart/protodpp.desktop
+## Developer environment
+You can easily run the application without a PiTFT or external HDMI monitor using VNC. (install VNC client on your host machine)
+You will want to change the screen resolution in `/boot/config.txt` to 640x480 or greater.
+If you are developing on a Mac and want to edit the files on the host machine, you can use [osxfuse and sshfs](https://osxfuse.github.io/)
 
-```
-[Desktop Entry]
-Type=Application
-Name=ProtoDPP
-Exec=/home/micronets/bin/protodpp.sh
-```
+## File System
+All of the code for this application lives in the folder where the repository was cloned. Additional application folders/files created at runtime:
+ - ./keys - public/private key pairs in formats required by the system
+ - ./certs - wifi certificates generated for this device as part of the clinic mode onboarding process
+ - ./screenshots - application screenshots (tap the icon in the upper left of the screen) are stored here.
 
-- ~/bin/protodpp.sh
+Additional components/files required by the application (created/modified at installation time)
+**wpa_supplicant**
+ - /usr/local/bin/wpa_supplicant
+ - /usr/local/bin/wpa_cli
+ - /etc/wpa_supplicant/wpa_supplicant.conf
 
-```
-#!/bin/bash
-cd /etc/micronets/python3
-sudo /usr/bin/python3 proto_pi.py &
-```
+**splash screens**
+ - /etc/systemd/system/splashscreen.service
+ - /usr/lib/systemd/system-shutdown/goodbyescreen.service
+ - /usr/local/images/splash.png
+ - /usr/local/images/goodbye.png
+ - /usr/local/bin/splash.sh
+ - /usr/local/bin/goodbye.sh
 
-## Required sudo privileges
-```
-micronets ALL=NOPASSWD: /usr/bin/rsync
-micronets ALL=NOPASSWD: /usr/bin/python protodpp.py
-micronets ALL=NOPASSWD: /usr/bin/python3 proto-pi.py
-micronets ALL=NOPASSWD: /usr/bin/vi
-micronets ALL=NOPASSWD: /sbin/reboot
-micronets ALL=NOPASSWD: /sbin/shutdown
-micronets ALL=NOPASSWD: /bin/systemctl restart lightdm
+**application**
+ - ~/.config/autostart/proto-pi.desktop - Application startup file
+ - /etc/sudoers.d/010-username - sudo privileges for application
 
-```
-
-
-## System Installation
-Starting from a bare Raspbian installation, here is an edited history file detailing package installation:
-(It is likely that some pieces have escaped my history and therefore missing)
-
-TODO: 
-	sudo apt-get install vim
-	sudo apt-get update
-	### Add a priviledged account with sudo ()
-	sudo groupadd micronets
-	sudo usermod -a -G micronets <username>
-	sudo usermod -a -G micronets pi
-	sudo usermod -a -G gpio <username>
-	sudo usermod -a -G gpio pi
-	sudo apt-get install python-dev python-pip
-	sudo pip install --upgrade distribute
-	sudo pip install ipython
-	sudo pip install --upgrade RPi.GPIO
-	### add ssh certificate for ssh login
-	sudo apt-get install wpa_supplicant
-	### install luma display drivers: 
-		- https://luma-lcd.readthedocs.io/en/latest/ (st7735)
-		- https://luma-oled.readthedocs.io/en/latest/install.html (ssd1351)
-	### install protomed application (elsewhere in this document)
-	sudo update-rc.d protomed defaults
-	sudo reboot
-
-
-## Protomed Application Installation
-Once the system is setup and you have ssh working, run `./install/upload <host>`. 
-This should copy the required files to `/etc/micronets`. You might have to create this folder first. 
-It will also copy the startup script to `/etc/init.d`
-
-## Configuration
-On startup, if `config/thisRegistration.json` does not exist, it is copied from `config/registration.json`. (it is not a file in the repository). Also, if `config/thisDevice` does not exist, a symlink is created to `config/devices/device-0.json`. This is done to preserve the device configuration when the software is updated.
-
-## Operation
-- You may have to edit `config/thisRegistration.json` and change the url if the server base url is not `https://demo.alpineseniorcare.com/micronets2`
-- On first run, if `config/thisRegistration.json` does not exist, it is created by copying `config/registration.json`
-- Navigate a browser window to `https://alpineseniorcare.com/micronets2/portal/device-list`
-- Power on the device (make sure battery has a good charge)
-	- Ensure red slide switch (master on/off) on side is in the on position (towards the display)
-	- Momentarily press the RED button to power on the device. It will take a few minutes for the display to come on.
-- Click the GREEN button. 
-	- Green LED should flash slowly
-	- Device should appear in browser
-- If you click the GREEN button again, it will cancel the onboarding and the device will disappear from the browser.
-- Otherwise, click the device in the browser
-	- You will be redirected to the MSO authentication server
-	- Scan the QRCode if you have the iPhone or just click on the QRCode
-	- Pairing should complete and the green LED should remain lit.
-- To 'un-onboard', click the black recessed reset button on the side of the device. 
-	- Green LED should flash rapidly for a second, then remain off. Certs and wpa_supplicant have been reset
-- The recessed black slide switch on the side of the device is the mode switch. 
-	- Up position (towards display) is DPP mode, down is clinic mode.
-- Power off the unit by press/holding the RED button for 5 seconds. This does an orderly shutdown of the Raspberry Pi so that the SD card does not become corrupted.
-- Lock the device off by sliding the red switch on the side down (away from the display).
-- To cycle the wifi connection and restart the python script, momentarily press the red button. This is way faster than powering off/on the device.
-- A screensaver activates after 1 minute of inactivity (we were getting burn-in on the OLED displays). Pressing either the GREEN or RED button deactivates the screensaver. 
-- Messages on the screen are cleared after 30 seconds.
-
-## Troubleshooting
-Log file: `/tmp/protomed.log`
-
-### Default Network
-There should always be the following files present for the default (clinic) network in `/etc/micronets/networks/default`:
- - network.config (this should have entries for one or more "clinic" SSID, currently "visitors" and "micronets-hs")
-If the default network uses WPA Enterprise certificates, there should also be certs etc in this folder.
-
-### Onboarded Device
-An onboarded device will have a `/etc/wpa_supplicant/wpa_supplicant.conf` file that looks like this:
-
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-
-# hot spot on mobile phone - backup clinic wifi for demos while traveling
-network={
-    priority=1
-    ssid="micronets-hs"
-    psk="secblanket"
-    key_mgmt=WPA-PSK
-}
-# clinic wifi
-network={
-    priority=0
-    ssid="visitors"
-    psk="rockymountain"
-    key_mgmt=WPA-PSK
-}
-# subscriber wifi
-network={
-    priority=10
-    ssid="auntbetty-gw"
-    scan_ssid=1
-    key_mgmt=WPA-EAP
-    group=CCMP TKIP
-    eap=TLS
-    identity="micronets"
-    ca_cert="/etc/micronets/networks/subscriber/ca.pem"
-    client_cert="/etc/micronets/networks/subscriber/wifi.crt"
-    private_key="/etc/micronets/networks/subscriber/wifi.crt"
-    private_key_passwd="whatever"
-}
-
-There should also be these files in `/etc/micronets/networks/subscriber`:
-
- - ca.pem
- - network.config
- - wifi.crt
- - wifi_key
-
-When the device is advertised, the key and CSR files should be created here:  `/etc/micronets/ssh`:
-
- - wifiCSR.pem
- - wifiKey
- - wifiKey.pub
-
-### Reset Device
-A reset device will have a `/etc/wpa_supplicant/wpa_supplicant.conf` file that looks like this:
-
-	ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-	update_config=1
-
-	network={
-	    priority=0
-	    ssid="visitors"
-	    psk="rockymountain"
-	    key_mgmt=WPA-PSK
-	}
-
-There should be no files in `/etc/micronets/networks/subscriber`
-
-## Standalone Testing
-You can test the onboarding sequence without an actual ProtoMed device. 
-- Clone an SD card from an existing device or install platform from scratch on a Raspberry Pi Zero W.
-- Install latest software onto the Pi Zero from this repository. `./install/upload <host>`
-- From the python folder: `sudo python onboard.py`
-
-
-
-
+**system**
+ - /boot/config.txt - HDMI screen resolution and onboard wifi disable flag

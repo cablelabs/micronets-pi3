@@ -63,7 +63,6 @@ class ProtoClinic(TKApp):
 		self.set_state(AppState.SPLASH)
 
 		# Start the main application interval timer
-		#threading.Timer(1.0, self.main_timer)
 		self.main_timer()
 
 		#^ __init__ ^#
@@ -88,17 +87,22 @@ class ProtoClinic(TKApp):
 
 		# Buttons
 		self.onboard_button = self.buttons_window.add_button(0, 'onboard.png', self.click_onboard)
-		#self.cancel_button = self.buttons_window.add_button(0, 'cancel.png', self.click_onboard, None, False) -- clinic mode only
+		self.cancel_button = self.buttons_window.add_button(0, 'cancel.png', self.click_onboard, None, False)
 		self.countdown_button = self.buttons_window.add_button(0, None, self.click_onboard, None, False)
 		self.refresh_button = self.buttons_window.add_button(1, 'refresh.png', self.click_cycle_wifi)
 		self.settings_button = self.buttons_window.add_button(2, 'settings.png', self.click_settings)
 		self.shutdown_button = self.buttons_window.add_button(3, 'shutdown.png', self.click_power, self.release_power)
 		self.countdown_button.set_text("", "white", TKWidget.font1)
 
+		# Hardware buttons
+		self.hardware_button(0, self.click_onboard)
+		self.hardware_button(1, self.click_cycle_wifi)
+		self.hardware_button(2, self.click_settings)
+		self.hardware_button(3, self.click_power, self.release_power)
+
 		# Animations
 		self.splash_window = TKAnimation(self.main_window, 'earth.gif', 6, self.splash_end_event)
 		self.fireworks_window = TKAnimation(self.main_window, 'fireworks.gif', 2, self.fireworks_end_event)
-		#self.wait_window = TKAnimation(self.main_window, 'loading.gif', 2, self.wait_end_event)
 
 		## UI state management ##
 
@@ -158,13 +162,19 @@ class ProtoClinic(TKApp):
 	def display_splash(self):
 		logger.info("display splash")
 		self.splash_window.start()
+		try:
+			ethernet_ip = network.get_ethernet_ipaddress()
+			if ethernet_ip:
+				self.footer_window.set_text(ethernet_ip)
+		except:
+			pass
 
 	def end_splash(self):
 		logger.info("end splash")
+		self.footer_window.set_text("")
 		self.splash_window.unload()
 
 	def display_status(self):
-		#logger.info("display_status")
 		self.update_status()
 
 	def display_fireworks(self):
@@ -278,9 +288,6 @@ class ProtoClinic(TKApp):
 		
 		# todo, toggle betweek onboard and cancel
 
-
-
-
 		# temp
 		self.message_window.clear()
 		self.message_window.add_message("Begin Onboard..")
@@ -334,9 +341,8 @@ class ProtoClinic(TKApp):
 
 		try:
 			# check for change in wifi connection
-			# if self.state == AppState.STATUS, changes will be reflected in UI
-			self.update_status()
-
+			if self.state == AppState.STATUS or self.state == AppState.MESSAGES:
+				self.update_status()
 
 			threading.Timer(2.0, self.main_timer).start()
 

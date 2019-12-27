@@ -16,7 +16,7 @@ import binascii
 from utils.syslogger import SysLogger
 import base64
 
-# Logfile is /tmp/protodpp.log
+# Logfile is /tmp/<argv[0]>.log
 logger = SysLogger().logger()
 
 # Default subscriber keys directory
@@ -47,7 +47,7 @@ class ECCKeys():
 			private_pem = self.private_key_pem(private_key)
 			private_pem_chars = private_pem.decode("utf-8")
 
-			# We only generate this compressed public key to see if there will be a slash in it. dpp_bootstrap_gen will 
+			# We generate this compressed public key to see if there will be a slash in it. dpp_bootstrap_gen will 
 			# generate an identical compressed public key in the uri from the hex encoded dpp private key
 			cmd = 'echo "'+private_pem_chars+'" | openssl ec -pubout -outform PEM -param_enc named_curve -conv_form compressed'
 			cpem = os.popen(cmd).read()
@@ -57,6 +57,15 @@ class ECCKeys():
 
 			# Try again
 			#logger.info("key contains slash")
+
+		# Save the compressed key so it can be used to register the mud_url, if needed
+		lines = cpem.split('\n')
+		key_chars = ""
+		for line in lines:
+			if not "PUBLIC KEY-----" in line:
+				key_chars += line
+		with open(keys_dir+'/'+name+".dpp.pub", "wb") as f:
+			f.write(key_chars.encode('utf-8'))
 
 		# Here with a key whose compressed public key does not contain a slash
 		# Save public/private keys in PEM format
@@ -96,9 +105,11 @@ class ECCKeys():
 		if not name:
 			name = key_name
 		try:
-			os.remove(keys_dir+'/'+name)
-			os.remove(keys_dir+'/'+name+".pub")
-			os.remove(keys_dir+'/'+name+".dpp")
+			#os.remove(keys_dir+'/'+name)
+			#os.remove(keys_dir+'/'+name+".pub")
+			#os.remove(keys_dir+'/'+name+".dpp")
+			#os.remove(keys_dir+'/'+name+".dpp.pub")
+			os.remove(keys_dir+'/'+name+'*')
 		except Exception as e:
 			pass
 
@@ -165,7 +176,8 @@ class ECCKeys():
 		self.private_key = self.load_private_key()
 		self.public_key = self.load_public_key()
 		self.private_key_dpp = self.load_private_key_dpp()
-		return (self.public_key and self.private_key and self.private_key_dpp)
+		self.public_key_dpp = self.load_public_key_dpp()
+		return (self.public_key and self.private_key and self.private_key_dpp and self.public_key_dpp)
 
 	# Load private key object
 	def load_private_key(self, name=key_name):
@@ -198,9 +210,18 @@ class ECCKeys():
 	def load_private_key_dpp(self, name=key_name):
 		try:
 			with open(keys_dir+'/'+name+'.dpp', "rb") as key_file:
-				return key_file.read()
+				return key_file.read().decode('utf-8')
 		except:
 			logger.error("failed to load private key (dpp string)")
+			return None
+
+	# load public key string (der/compressed)
+	def load_public_key_dpp(self, name=key_name):
+		try:
+			with open(keys_dir+'/'+name+'.dpp.pub', "rb") as key_file:
+				return key_file.read().decode('utf-8')
+		except:
+			logger.error("failed to load public key (dpp string)")
 			return None
 
 ecc_keys = ECCKeys()
@@ -210,5 +231,7 @@ if __name__ == '__main__':
 	ecc_keys.generate_csr("my_csr")
 	print("csr: {}".format(ecc_keys.encoded_csr_base64()))
 	print( "deviceID: {}".format(ecc_keys.public_key_hash()))
+	print("dpp pubkey: "+ecc_keys.public_key_dpp)
+	print("dpp key: "+ecc_keys.private_key_dpp)
 
 
