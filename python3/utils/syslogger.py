@@ -12,7 +12,7 @@ from .singleton import Singleton
 # logger = SysLogger("/var/log/mylogfile").logger()
 
 # switch out local logger for testing
-local_mode = True
+local_mode = False
 
 class LocalLogger(object):
     def info(self, text):

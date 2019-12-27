@@ -126,7 +126,7 @@ class TKAnimation(TKWidget):
 				i += 1
 
 		if self.callback:
-			logger.info("animation " + "completed" if self.cancel_animation else "canceled")
+			#logger.info("animation completed" if self.cancel_animation else "animation canceled")
 			self.callback(self.cancel_animation)
 			self.hide()
 

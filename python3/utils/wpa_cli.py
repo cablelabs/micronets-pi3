@@ -11,14 +11,10 @@ logger = SysLogger().logger()
 
 chan_freqs = {1:2412, 2:2417, 3:2422, 4:2427, 5:2432, 6:2437, 7:2442, 8:2447, 9:2452, 10:2457, 11:2462, 12:2467, 13:2472, 14:2484}
 
-def dpp_bootstrap_gen(mac):
+def dpp_bootstrap_gen(mac, channel_class, channel, key, vendor):
 
 	cmd = "dpp_bootstrap_gen type=qrcode mac={} chan={}/{} key={} info={}".format(
-		mac,
-		config.get('channelClass'),
-		config.get('channel'),
-		config.get('p256'),
-		config.get('vendorCode'))
+		mac, channel_class, channel, key, vendor)
 
 	lines = exec_cli(cmd, 1)
 	id = lines[0][0]

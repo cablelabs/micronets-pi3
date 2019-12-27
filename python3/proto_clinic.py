@@ -229,7 +229,7 @@ class ProtoClinic(TKApp):
 			self.set_state(AppState.STATUS)
 
 	def splash_end_event(self, canceled):
-		logger.info("splash ended. canceled: "+ str(canceled))
+		#logger.info("splash ended. canceled: "+ str(canceled))
 		if not canceled:
 			self.set_state(AppState.STATUS)
 
@@ -330,7 +330,7 @@ class ProtoClinic(TKApp):
 				self.message_window.add_message("Restarting Application..")
 				self.set_state(AppState.MESSAGES)
 				logger.info("Restarting Application..")
-				Timer(2.0, os.popen, self.restart).start()
+				Timer(2.0, self.restart).start()
 
 	# Window click events
 	def click_status_window(self, nullArg=0):

@@ -201,8 +201,13 @@ class ProtoDPP(TKApp):
 	def display_qrcode(self):
 		if not config.get('disableMUD'):
 			self.dpp_params()
-		self.reset_wifi()
-		uri = wpa_cli.dpp_bootstrap_gen(network.get_mac())
+		wpa_cli.remove_networks()
+		wpa_cli.reconfigure()
+		uri = wpa_cli.dpp_bootstrap_gen(network.get_mac(),
+			config.get('channelClass'),
+			config.get('channel'),
+			ecc_keys.private_key_dpp,
+			config.get('vendorCode'))
 		self.qrcode_window.generate(uri)
 		wpa_cli.dpp_listen()
 		self.cancel_qrcode = False
@@ -232,7 +237,7 @@ class ProtoDPP(TKApp):
 				if response.status_code == 301:
 					response = requests.post(response.headers['Location'])
 				if response.status_code == 200:
-					logger.info("Device registered")
+					logger.info("device registered")
 				else:
 					logger.error("Failed to register device: {}".format(response.status_code))
 
@@ -282,7 +287,7 @@ class ProtoDPP(TKApp):
 			self.set_state(AppState.STATUS)
 
 	def splash_end_event(self, canceled):
-		logger.info("splash ended. canceled: "+ str(canceled))
+		#logger.info("splash ended. canceled: "+ str(canceled))
 		if not canceled:
 			self.set_state(AppState.STATUS)
 

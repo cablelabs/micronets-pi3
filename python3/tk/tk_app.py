@@ -4,6 +4,7 @@ import os, sys, time
 import datetime
 import threading
 from threading import Timer
+import traceback
 from tkinter import *
 from .tk_main import TKMain
 from utils.config import config
@@ -151,6 +152,9 @@ class TKApp():
 	# Update user interface for new state and initialize as required
 	def set_state(self, new_state):
 
+		#logger.info("\n\nset_state: {}".format(new_state))
+		#traceback.print_stack()
+
 		self.last_state = self.state
 		self.state = new_state
 
@@ -174,14 +178,17 @@ class TKApp():
 	def place_widgets(self, all_widgets, visible_widgets):
 		for widget in all_widgets:
 			if widget in visible_widgets:
+				#logger.info("show widget: {}".format(type(widget).__name__))
 				widget.show()
 			else:
+				#logger.info("hide widget: {}".format(type(widget).__name__))
 				widget.hide()
 
 	def take_screenshot(self, null_arg=0):
 
 		# Screenshots directory
-		screenshots_folder = '/etc/micronets/screenshots'
+		folder = os.path.dirname(os.path.realpath(__file__))
+		screenshots_folder = os.path.join(folder, '../../screenshots')
 		if not os.path.exists(screenshots_folder):
 			os.makedirs(screenshots_folder)
 
@@ -195,6 +202,8 @@ class TKApp():
 			screenshot = ImageGrab.grab(bbox=(self.main_x, self.main_y, self.main_x+320, self.main_y+240))
 
 		screenshot.save(filepath)
+
+		logger.info("screenshot captured: {}".format(filepath))
 
 	def restart(self):
 		os.popen("sudo systemctl restart lightdm")
