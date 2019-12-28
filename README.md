@@ -45,8 +45,8 @@ Note: THIS APPLICATION REQUIRES PYTHON 3.5+!!
  - Adds current user to gpio and netdev groups
 
 #### Installer notes:
- - The unstaller can be run successively to pull in updates from micronets-hostap
- - Application is updated with a `git pull`
+ - The installer can be run successively to pull in updates from micronets-hostap
+ - Application is updated with `git pull`
  - A key pair that works for both clinic and DPP is created on first run
  - A default application configuration file is generated on first run
  - Application is run as user (no sudo required)
