@@ -1,11 +1,14 @@
 # Proto-Pi Installation and Configuration
 
-The Proto-Pi is a general purpose iOT prototype device that can easily be modified to suit your needs. A python3/Tkinter application, it provides the following:
+The Proto-Pi is a general purpose iOT prototype device that can easily be modified to suit your needs. 
+
+A python3/Tkinter application, it provides the following:
  - UI with Touchscreen
  - 4 hardware GPIO buttons
  - Network connectivity, both ethernet and wifi
  - Linux environment
  - DPP enabled onboarding (with the Alfa adapter)
+
 It includes a Tkinter base class for the application, and widget wrappers to make UI management easy. 
 
 This code runs on a Raspberry Pi 3B+, with the following components:
@@ -73,7 +76,7 @@ Note: THIS APPLICATION REQUIRES PYTHON 3.5+!!
  # (take default prompts and reboot)
 ```
  - After installation, optionally edit /boot/config.txt to change the HDMI resolution to 320x240 for full screen operation
- 
+
 ## Configuration
 A default configuration file (`config/config.json`) is generated on first run, which can be subsequently edited. It will not be overwritten when pulling from the repo.
 #### Clinic Mode Settings
@@ -82,6 +85,7 @@ In the `config/devices` folder are several device profiles to choose from. The s
 
 ## Runtime environment
 This application is run full screen on the PiTFT device (320x240) and is a TKinter application that runs on the desktop (lightdm), using the desktop configuration file `~/.config/autostart/protodpp.desktop`
+
 It runs in user space and does not require **sudo**. It gets its required privileges from membership in the `gpio` and `netdev` groups and from sudoer privileges for `shutdown, reboot, and restarting the desktop`.
 
 ## Developer environment
@@ -102,6 +106,7 @@ All of the code for this application lives in the folder where the repository wa
  - ./screenshots - application screenshots (tap the icon in the upper left of the screen) are stored here.
 
 Additional components/files required by the application (created/modified at installation time)
+
 **wpa_supplicant**
  - /usr/local/bin/wpa_supplicant
  - /usr/local/bin/wpa_cli
