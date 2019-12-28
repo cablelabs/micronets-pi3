@@ -24,6 +24,22 @@ def makeURL(host, path):
 
 def exec_dpp_onboard_proxy(config, mac, dpp_uri, display):
 
+	# Backdoor that uses the gateway REST interface
+	dpp_host = config.get(['dppProxy','configuratorIP'])
+	if dpp_host:
+
+		# Try to create a local micronet. It might already exist, that's Ok.
+		uri = "http://{}:5000/micronets/v1/gateway/micronets".format(dpp_host)
+		requests.post(uri)
+
+		# Send the onboard request
+		display.add_message('direct onboard: {}'.format(dpp_host))
+		uri = "http://{}:5000/micronets/v1/gateway/micronets/{}/devices/{}/onboard".format(dpp_host,'security',config.get('dppName',"Trusty iOT"))
+		requests.post(uri)
+
+		return
+
+
 	logger.info("exec_dpp_onboard_proxy")
 
 	session = requests.session()

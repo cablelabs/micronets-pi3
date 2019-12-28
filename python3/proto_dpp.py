@@ -184,7 +184,7 @@ class ProtoDPP(TKApp):
 			if ethernet_ip:
 				self.footer_window.set_text(ethernet_ip)
 				if not config.get('disableMUD'):
-					self.register_mud_url()
+					threading.Thread(target=self.register_mud_url, args=()).start()
 		except Exception as e:
 			logger.error("register_mud_url: {}".format(e))
 			pass
