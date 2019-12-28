@@ -72,6 +72,8 @@ Note: THIS APPLICATION REQUIRES PYTHON 3.5+!!
  ./install
  # (take default prompts and reboot)
 ```
+ - After installation, optionally edit /boot/config.txt to change the HDMI resolution to 320x240 for full screen operation
+ 
 ## Configuration
 A default configuration file (`config/config.json`) is generated on first run, which can be subsequently edited. It will not be overwritten when pulling from the repo.
 #### Clinic Mode Settings
@@ -86,6 +88,12 @@ It runs in user space and does not require **sudo**. It gets its required privil
 You can easily run the application without a PiTFT or external HDMI monitor using VNC. (install VNC client on your host machine)
 You will want to change the screen resolution in `/boot/config.txt` to 640x480 or greater.
 If you are developing on a Mac and want to edit the files on the host machine, you can use [osxfuse and sshfs](https://osxfuse.github.io/)
+
+## Operational Notes
+- Clicking on the Header will toggle the PiTFT backlight
+- Clicking on the icon in the Header will take an application screenshot
+- Clicking on the Status window or Message window will toggle between these two windows
+- You can interrupt an animation (splash or fireworks) by tapping the animation or using any of the hardware buttons to select an action
 
 ## File System
 All of the code for this application lives in the folder where the repository was cloned. Additional application folders/files created at runtime:
