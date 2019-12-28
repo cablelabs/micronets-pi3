@@ -33,16 +33,16 @@ Note: THIS APPLICATION REQUIRES PYTHON 3.5+!!
 ## Installation
 
 #### Installer actions:
- - Install and configure the PiTFT display
- - Install build prerequisites for wpa_supplicant
- - Build and install wpa_supplicant from micronets-hostap
- - Disable onboard wifi (optional, y/N prompt)
- - Create an auxilliary sudoers file for shutdown, reboot, and restarting the desktop
- - Create a lightdm desktop entry to autostart the python app
- - Install all python modules required by the app
- - Install system services (boot/shutdown splash screens)
- - Disable factory wpa_supplicant service (/sbin)
- - Add current user to gpio and netdev groups
+ - Installs and configures the PiTFT display
+ - Installs build prerequisites for wpa_supplicant
+ - Builds and installs wpa_supplicant from micronets-hostap
+ - Disables onboard wifi (optional, y/N prompt)
+ - Creates an auxilliary sudoers file for shutdown, reboot, and restarting the desktop
+ - Creates a lightdm desktop entry to autostart the python app
+ - Installs all python modules required by the app
+ - Installs system services (boot/shutdown splash screens)
+ - Disables factory wpa_supplicant service (/sbin)
+ - Adds current user to gpio and netdev groups
 
 #### Installer notes:
  - The unstaller can be run successively to pull in updates from micronets-hostap
