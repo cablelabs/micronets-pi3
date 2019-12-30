@@ -209,9 +209,11 @@ class TKApp():
 		os.popen("sudo systemctl restart lightdm")
 
 	def reboot(self):
+		os.popen("touch /tmp/rebooting")
 		os.popen("sudo reboot now")
 
 	def shutdown(self):
+		#os.popen("rm /tmp/rebooting")
 		os.popen("sudo shutdown -h now")
 
 

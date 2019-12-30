@@ -24,6 +24,7 @@ sudo chmod a+x $script_file
 #### Goodbye screen service ####
 echo "*** Configuring goodbye screen service ***"
 sudo cp -f ../files/goodbye.png  /usr/local/images/
+sudo cp -f ../files/reboot.png  /usr/local/images/
 service_file=/usr/lib/systemd/system-shutdown/goodbyescreen.service
 sudo cp -f ../files/goodbyescreen.service $service_file
 sudo systemctl enable $service_file
