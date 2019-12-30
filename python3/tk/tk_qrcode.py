@@ -11,11 +11,16 @@ class TKQRCode(TKWidget):
 		TKWidget.__init__(self, parent)
 
 		self.image = None
-		self.label = None
 
 		# main frame
 		self.frame = Frame(parent.frame, background="white", borderwidth=0, relief="solid")
 		self.place_widget(self.frame,l, t, w, h, show)
+
+		self.label = Label(self.frame)
+		self.place_widget(self.label,20, 0, 240, 240)
+
+		self.label['bg'] = self.frame['bg']
+
 
 	def generate(self, data):
 
@@ -32,10 +37,7 @@ class TKQRCode(TKWidget):
 		image = image.resize((240, 240),Image.ANTIALIAS)
 
 		photo = ImageTk.PhotoImage(image)
-		self.label = Label(self.frame, image=photo)
-		self.place_widget(self.label,20, 0, 240, 240)
-
-		self.label['bg'] = self.frame['bg']
+		self.label.config(image=photo)
 		self.label.saveicon = self.label   # otherwise it disappears
 		self.label.savephoto = photo
 
@@ -45,4 +47,12 @@ class TKQRCode(TKWidget):
 		#self.label.savephoto = None
 		#self.label = None
 		self.hide()
+
+	def register_click(self, callback):
+
+		# overloaded TKWidget because we need to respond if child windows are clicked as well
+		self.frame.bind("<Button-1>",callback)
+		self.label.bind("<Button-1>",callback)
+
+
 

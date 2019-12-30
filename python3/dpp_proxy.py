@@ -12,6 +12,7 @@ import requests
 import os, sys, time, traceback
 from subprocess import call
 from utils.syslogger import SysLogger
+from utils.config import config
 
 
 # Logfile is /tmp/<argv[0]>.log
@@ -22,23 +23,7 @@ def makeURL(host, path):
 	url = "{}/portal/v1/dpp/{}".format(host, path)
 	return url
 
-def exec_dpp_onboard_proxy(config, mac, dpp_uri, display):
-
-	# Backdoor that uses the gateway REST interface
-	dpp_host = config.get(['dppProxy','configuratorIP'])
-	if dpp_host:
-
-		# Try to create a local micronet. It might already exist, that's Ok.
-		uri = "http://{}:5000/micronets/v1/gateway/micronets".format(dpp_host)
-		requests.post(uri)
-
-		# Send the onboard request
-		display.add_message('direct onboard: {}'.format(dpp_host))
-		uri = "http://{}:5000/micronets/v1/gateway/micronets/{}/devices/{}/onboard".format(dpp_host,'security',config.get('dppName',"Trusty iOT"))
-		requests.post(uri)
-
-		return
-
+def exec_dpp_onboard_proxy(mac, dpp_uri, display):
 
 	logger.info("exec_dpp_onboard_proxy")
 
@@ -84,8 +69,13 @@ def exec_dpp_onboard_proxy(config, mac, dpp_uri, display):
 	display.add_message("Session established")
 
 	# Get MUD
+	mfg_name = None
+	device_model = None
+	device_class = None
+	device_type = None
+	device_name = None
+
 	if not config.get('disableMUD'):
-		#curl -L "https://registry.micronets.in/mud/v1/mud-file/DAWG/MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgACDIBBiMf4W+tukQcNKz5eObkMp3tNPFJRvBhE1sop3K0="
 		url = "https://registry.micronets.in/mud/v1/mud-file/{}/{}".format(vendor_code, pubkey)
 
 		logger.info("MUD: " + url)
@@ -120,12 +110,17 @@ def exec_dpp_onboard_proxy(config, mac, dpp_uri, display):
 	reqBody["bootstrap"]["pubkey"] = pubkey
 	reqBody["bootstrap"]["vendor"] = vendor_code
 	reqBody["user"]["deviceRole"] = role
-	reqBody["user"]["deviceName"] = device_name
-	reqBody["device"]["class"] = device_class
-	reqBody["device"]["type"] = device_type
-	reqBody["device"]["model"] = device_model
 	reqBody["device"]["modelUID"] = model_uid
-	reqBody["device"]["manufacturer"] = mfg_name
+	if device_name:
+		reqBody["user"]["deviceName"] = device_name
+	if device_class:
+		reqBody["device"]["class"] = device_class
+	if device_type:
+		reqBody["device"]["type"] = device_type
+	if device_model:
+		reqBody["device"]["model"] = device_model
+	if mfg_name:
+		reqBody["device"]["manufacturer"] = mfg_name
 
 	data = json.dumps(reqBody)
 
@@ -138,43 +133,13 @@ def exec_dpp_onboard_proxy(config, mac, dpp_uri, display):
 
 	display.add_message("Onboard initiated")
 
-	# wait for status to accumulate
-	#time.sleep(5)
-	# status seems to be broken
-'''
-	url = makeURL(host, 'status')
-	logger.info("Status: " + url)
-
-	response = session.get(url)
-
-	logger.info("status: {}".format(response.status_code))
-	logger.info(response.json())
-
-	if response.status_code != 200:
-		display.add_message("Status failed")
-		return 
-
-	# Logout
-	url = makeURL(host, 'logout')
-
-	logger.info("Logout: " + url)
-
-	response = session.post(url)
-
-	if response.status_code != 200 and response.status_code != 204:
-		display.add_message("Logout failed")
-		return
-
-	display.add_message("Logout succeeded")
-'''
-
-def dpp_onboard_proxy(config, mac, uri, display):
+def dpp_onboard_proxy(mac, uri, display):
 	try:
-		exec_dpp_onboard_proxy(config, mac, uri, display)
+		exec_dpp_onboard_proxy(mac, uri, display)
 	except Exception as e:
 		display.add_message("!! {}".format(e.__doc__))
 		logger.error(e.__doc__)
-		logger.error(e.message)
+		logger.error(e.args)
 		logger.error('-'*60)
-        logger.error(traceback.print_exc())
-        logger.error('-'*60)
+		logger.error(traceback.print_exc())
+		logger.error('-'*60)

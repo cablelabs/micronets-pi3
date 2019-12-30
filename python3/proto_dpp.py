@@ -13,6 +13,8 @@ import utils.wpa_cli as wpa_cli
 from utils.ecc_keys import ecc_keys
 import pyscreenshot as ImageGrab
 
+import dpp_proxy
+
 from tkinter import *
 from tk.tk_app import TKApp
 from tk.tk_header import TKHeader
@@ -69,6 +71,7 @@ class ProtoDPP(TKApp):
 
 		# Start the main application interval timer
 		#threading.Timer(1.0, self.main_timer)
+		self.power_clicked = False
 		self.main_timer()
 
 		#^ __init__ ^#
@@ -161,6 +164,7 @@ class ProtoDPP(TKApp):
 		self.message_window.register_click(self.restore_state)
 		self.header_window.mode_icon.register_click(self.take_screenshot)
 		self.header_window.register_click(self.toggle_backlight)
+		self.qrcode_window.register_click(self.dpp_onboard_with_proxy)
 
 	# Revert to prior state. Mainly used for returning from message window
 	def restore_state(self, null_arg=0):
@@ -169,7 +173,8 @@ class ProtoDPP(TKApp):
 	# Update the status window and underlying message window (connection details)
 	def update_status(self):
 		self.status_window.update()
-		self.message_window.display_connection_info()
+		if not self.power_clicked:
+			self.message_window.display_connection_info()
 
 	def cancel_animations(self):
 		self.splash_window.cancel()
@@ -202,13 +207,14 @@ class ProtoDPP(TKApp):
 		if not config.get('disableMUD'):
 			self.dpp_params()
 		wpa_cli.remove_networks()
+		wpa_cli.save_config()
 		wpa_cli.reconfigure()
-		uri = wpa_cli.dpp_bootstrap_gen(network.get_mac(),
+		self.dpp_uri = wpa_cli.dpp_bootstrap_gen(network.get_mac(),
 			config.get('channelClass'),
 			config.get('channel'),
 			ecc_keys.private_key_dpp,
 			config.get('vendorCode'))
-		self.qrcode_window.generate(uri)
+		self.qrcode_window.generate(self.dpp_uri)
 		wpa_cli.dpp_listen()
 		self.cancel_qrcode = False
 		self.qrc_counter = config.get("qrcodeCountdown", 30)
@@ -222,6 +228,9 @@ class ProtoDPP(TKApp):
 			model_id = config.get('deviceModelUID')
 			mud_url = "https://registry.micronets.in/mud/v1/model/mud-url/{}/{}".format(vendor, model_id)
 		wpa_cli.set('dpp_mud_url', mud_url)
+
+	def dpp_onboard_with_proxy(self, null_arg=0):
+		dpp_proxy.dpp_onboard_proxy(network.get_mac(), self.dpp_uri, self.message_window)
 
 	# update our mud registry on startup if we have an ethernet connection and user hasn't configured an explicit mud_url.
 	def register_mud_url(self):
@@ -258,6 +267,7 @@ class ProtoDPP(TKApp):
 
 	def reset_wifi(self):
 		wpa_cli.remove_networks()
+		wpa_cli.save_config()
 		wpa_cli.reconfigure()
 		self.set_state(AppState.STATUS)
 
@@ -360,6 +370,7 @@ class ProtoDPP(TKApp):
 		self.set_state(AppState.SETTINGS)
 
 	def click_power(self, nullArg=0):
+		self.power_clicked = True
 		self.cancel_animations()
 		logger.info("click_power")
 
@@ -392,11 +403,12 @@ class ProtoDPP(TKApp):
 		try:
 
 			# check for change in wifi connection
-			if self.state == AppState.STATUS or self.state == AppState.MESSAGES:
-				self.update_status()
+			if not self.power_clicked:
+				if self.state == AppState.STATUS or self.state == AppState.MESSAGES:
+					self.update_status()
 
-			if self.state == AppState.QRCODE:
-				self.qrcode_timer_event()
+				if self.state == AppState.QRCODE:
+					self.qrcode_timer_event()
 
 			threading.Timer(2.0, self.main_timer).start()
 
