@@ -75,7 +75,7 @@ Note: THIS APPLICATION REQUIRES PYTHON 3.5+!!
  ./install
  # (take default prompts and reboot)
 ```
- - After installation, optionally edit /boot/config.txt to change the HDMI resolution to 320x240 for full screen operation
+ - After installation, optionally change the application to run fullscreen (320x240) using `./deploy/bin/_fullscreen.sh` [on/off]
 
 ## Configuration
 A default configuration file (`config/config.json`) is generated on first run, which can be subsequently edited. It will not be overwritten when pulling from the repo.
