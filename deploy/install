@@ -33,6 +33,9 @@ sudo ./bin/_wireless.sh
 # Build and install wpa_supplicant
 ./bin/_wpa_supplicant.sh
 
+# Check for OS version specific settings
+sudo ./bin/_version.sh
+
 # Restart?
 read -r -p "Reboot Now? [y/N] " response
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]

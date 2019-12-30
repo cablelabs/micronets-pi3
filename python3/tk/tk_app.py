@@ -49,6 +49,10 @@ class TKApp():
 			# hide title bar
 			self.hasTitleBar = False
 			self.window.overrideredirect(1)
+			# turn off cursor (ymmv, sometimes displays edit cursor)
+			if not config.get('showCursor', False):
+				self.window.config(cursor="none")
+
 
 
 		self.window.geometry("320x240+" + str(self.main_x) + "+" +str(self.main_y))
