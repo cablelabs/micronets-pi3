@@ -65,13 +65,12 @@ class ProtoDPP(TKApp):
 		self.state = None
 		self.last_state = None
 		self.shutting_down = False
+		self.power_clicked = False
 
 		# Start with splash screen
 		self.set_state(AppState.SPLASH)
 
 		# Start the main application interval timer
-		#threading.Timer(1.0, self.main_timer)
-		self.power_clicked = False
 		self.main_timer()
 
 		#^ __init__ ^#
@@ -263,7 +262,8 @@ class ProtoDPP(TKApp):
 
 	def end_fireworks(self):
 		logger.info("end fireworks")
-		self.fireworks_window.unload()
+		# don't unload or there will be a lag for subsequent animations
+		#self.fireworks_window.unload()
 
 	def reset_wifi(self):
 		wpa_cli.remove_networks()
