@@ -75,15 +75,41 @@ def has_network():
 	return len(lines) > 0
 
 # get psk for an ssid (display purposes)
-def get_ssid_psk(ssid):
-	lines = exec_cli("list_networks", 2, False)
+# Note: wpa_cli won't return the actual psk, only *. So go to the wpa_supplicant.conf file instead.
+#def get_ssid_psk(ssid):
+#	lines = exec_cli("list_networks", 2, False)
+#
+#	for fields in lines:
+#		network = fields[0]
+#		if ssid == fields[1]:
+#			cmd = "get_network {} {}".format(network, "psk")
+#			lines2 = exec_cli(cmd, 1, False)
+#			return lines2[0][0]
 
-	for fields in lines:
-		network = fields[0]
-		if ssid == fields[1]:
-			cmd = "get_network {} {}".format(network, "psk")
-			lines2 = exec_cli(cmd, 1, False)
-			return lines2[0][0]
+def get_ssid_psk(ssid):
+
+	infile = '/etc/wpa_supplicant/wpa_supplicant.conf'
+
+	pskstr = "psk="
+	maxpsklen = 16
+
+	with open(infile, 'r') as fin:
+		network_found = False
+		for line in fin:
+			line = line.replace(" ","")
+			if "ssid=\""+ssid+"\"" in line:
+				network_found = True
+				continue
+			if network_found:
+				if pskstr in line:
+					psk = line[line.index(pskstr) + len(pskstr):]
+					if psk:
+						if len(psk) > maxpsklen:
+							psk = psk[:maxpsklen]+"..."
+						return psk
+
+		return "** psk-not-found **"
+
 
 # create a new network definition from dictionary of key/value pairs
 
