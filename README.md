@@ -2,6 +2,8 @@
 
 The Proto-Pi is a general purpose iOT prototype device that can easily be modified to suit your needs. 
 
+![](https://github.com/cablelabs/micronets-pi3/blob/master/image.png)
+
 A python3/Tkinter application, it provides the following:
  - UI with Touchscreen
  - 4 hardware GPIO buttons
