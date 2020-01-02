@@ -84,7 +84,7 @@ You will need to edit `config/networks.json` for the default networks to be prov
 In the `config/devices` folder are several device profiles to choose from. The selection is made in `config/config.json`. The default is `device-0`
 
 ## Runtime environment
-This application is run full screen on the PiTFT device (320x240) and is a TKinter application that runs on the desktop (lightdm), using the desktop configuration file `~/.config/autostart/protodpp.desktop`
+This application is run full screen on the PiTFT device (320x240) and is a TKinter application that runs on the desktop (lightdm), using the desktop configuration file `~/.config/autostart/proto-pi.desktop`
 
 It runs in user space and does not require **sudo**. It gets its required privileges from membership in the `gpio` and `netdev` groups and from sudoer privileges for `shutdown, reboot, and restarting the desktop`.
 
@@ -117,6 +117,7 @@ Additional components/files required by the application (created/modified at ins
  - /usr/lib/systemd/system-shutdown/goodbyescreen.service
  - /usr/local/images/splash.png
  - /usr/local/images/goodbye.png
+ - /usr/local/images/rebooting.png
  - /usr/local/bin/splash.sh
  - /usr/local/bin/goodbye.sh
 
