@@ -203,6 +203,9 @@ class ProtoDPP(TKApp):
 		self.update_status()
 
 	def display_qrcode(self):
+		self.cancel_qrcode = False
+		self.qrc_counter = config.get("qrcodeCountdown", 30)
+
 		if not config.get('disableMUD'):
 			self.dpp_params()
 		wpa_cli.remove_networks()
@@ -215,8 +218,6 @@ class ProtoDPP(TKApp):
 			config.get('vendorCode'))
 		self.qrcode_window.generate(self.dpp_uri)
 		wpa_cli.dpp_listen()
-		self.cancel_qrcode = False
-		self.qrc_counter = config.get("qrcodeCountdown", 30)
 
 	# set dpp params that will be exchanged with the configurator during onboarding
 	def dpp_params(self):
@@ -254,7 +255,9 @@ class ProtoDPP(TKApp):
 		wpa_cli.dpp_stop_listen()
 		self.qrcode_window.destroy()
 		self.cancel_qrcode = False
-		self.set_state(AppState.STATUS)
+
+		# We are already being called by set_state
+		# self.set_state(AppState.STATUS)
 
 	def display_fireworks(self):
 		logger.info("display fireworks")
@@ -398,6 +401,7 @@ class ProtoDPP(TKApp):
 		self.set_state(AppState.MESSAGES)
 
 	# UI updates
+
 	def main_timer(self):
 
 		try:
@@ -410,7 +414,7 @@ class ProtoDPP(TKApp):
 				if self.state == AppState.QRCODE:
 					self.qrcode_timer_event()
 
-			threading.Timer(2.0, self.main_timer).start()
+			threading.Timer(1.0, self.main_timer).start()
 
 		except Exception as e:
 			logger.info("timer exception: {}".format(e))

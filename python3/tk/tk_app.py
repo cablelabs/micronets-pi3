@@ -160,6 +160,11 @@ class TKApp():
 		#traceback.print_stack()
 
 		self.last_state = self.state
+
+		# Do any required cleanup from old state
+		if self.last_state and self.dispatch[self.last_state][1]:
+			self.dispatch[self.last_state][1]()
+		
 		self.state = new_state
 
 		# Hide/show windows
@@ -168,9 +173,6 @@ class TKApp():
 		# Hide/show buttons
 		self.place_widgets(self.all_buttons, self.visible_buttons[new_state])
 
-		# Do any required cleanup from old state
-		if self.last_state and self.dispatch[self.last_state][1]:
-			self.dispatch[self.last_state][1]()
 
 		# Do any required initialization for new state
 		if self.dispatch[new_state][0]:
