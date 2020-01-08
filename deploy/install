@@ -21,7 +21,8 @@ sudo usermod -a -G netdev,gpio $USER
 ./bin/_pip3.sh
 
 # Install system services 
-./bin/_services.sh
+# disabled for now. sometimes black screen on startup
+#./bin/_services.sh
 
 # Disable onboard wifi adapter
 # (not sure why sudo is required here, sudo is present for commands in script)
