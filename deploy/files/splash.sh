@@ -4,8 +4,10 @@
 counter=0
 while [ $counter -lt 40 ]
 do
-  if [ -e /dev/fb1 ]; then
+  if [ -w /dev/fb1 ]; then
   	/usr/bin/fbi -T 2 -d /dev/fb1 -noverbose -a /usr/local/images/splash.png  2> /dev/null
+  	break
+  else
      counter=$(expr $counter + 1)
   fi
   sleep .1s
