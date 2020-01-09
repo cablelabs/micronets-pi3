@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sleep 1
+
 systemctl list-jobs | egrep -q 'reboot.target.*start'
 if [ $?  -eq 0  ]; then
     file='/usr/local/images/reboot.png'
