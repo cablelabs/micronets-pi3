@@ -23,7 +23,8 @@ class TKQRCode(TKWidget):
 
 
 	def generate(self, data):
-
+		# restore background
+		self.frame.config(bg='white')
 		qr = qrcode.QRCode(
 			version=None,
 			error_correction=qrcode.constants.ERROR_CORRECT_L,

@@ -7,6 +7,9 @@ pushd "${0%/*}" > /dev/null
 # Installation script for proto-pi device
 #########################################################
 
+echo "*** Updating package manager ***" 
+sudo apt-get update
+
 # sudo privileges required by proto-pi
 ./bin/_sudoers.sh
 

@@ -13,6 +13,8 @@ import os, sys, time, traceback
 from subprocess import call
 from utils.syslogger import SysLogger
 from utils.config import config
+from utils.ecc_keys import ecc_keys
+from tk.tk_qrcode import TKQRCode
 
 
 # Logfile is /tmp/<argv[0]>.log
@@ -23,7 +25,7 @@ def makeURL(host, path):
 	url = "{}/portal/v1/dpp/{}".format(host, path)
 	return url
 
-def exec_dpp_onboard_proxy(mac, dpp_uri, display):
+def exec_dpp_onboard_proxy(mac, dpp_uri, display, qrcode_window):
 
 	logger.info("exec_dpp_onboard_proxy")
 
@@ -34,7 +36,7 @@ def exec_dpp_onboard_proxy(mac, dpp_uri, display):
 	password = config.get(['dppProxy','password'])
 	model_uid = config.get(['dppProxy','deviceModelUID'])
 	vendor_code = config.get('vendorCode')
-	pubkey = config.get('key')
+	pubkey = ecc_keys.public_key_dpp;
 	role = "sta"
 
 	# Login
@@ -82,18 +84,15 @@ def exec_dpp_onboard_proxy(mac, dpp_uri, display):
 
 		response = session.get(url)
 
-		if response.status_code != 200:
-			display.add_message("Get MUD failed")
-			return
+		if response.status_code == 200:
+			display.add_message("MUD file retrieved")
+			reply = response.json()
 
-		display.add_message("MUD file retrieved")
-		reply = response.json()
-
-		mfg_name = reply["ietf-mud:mud"]["mfg-name"]
-		device_model = reply["ietf-mud:mud"]["model-name"]
-		device_class = reply["ietf-mud:mud"]["ietf-mud-micronets:class-name"]
-		device_type = reply["ietf-mud:mud"]["ietf-mud-micronets:type-name"]
-		device_name = device_model
+			mfg_name = reply["ietf-mud:mud"]["mfg-name"]
+			device_model = reply["ietf-mud:mud"]["model-name"]
+			device_class = reply["ietf-mud:mud"]["ietf-mud-micronets:class-name"]
+			device_type = reply["ietf-mud:mud"]["ietf-mud-micronets:type-name"]
+			device_name = device_model
 
 	# Onboard
 	display.add_message("Begin Onboard")
@@ -132,10 +131,11 @@ def exec_dpp_onboard_proxy(mac, dpp_uri, display):
 		return
 
 	display.add_message("Onboard initiated")
+	qrcode_window.frame.config(bg='green')
 
-def dpp_onboard_proxy(mac, uri, display):
+def dpp_onboard_proxy(mac, uri, display, qrcode_window):
 	try:
-		exec_dpp_onboard_proxy(mac, uri, display)
+		exec_dpp_onboard_proxy(mac, uri, display, qrcode_window)
 	except Exception as e:
 		display.add_message("!! {}".format(e.__doc__))
 		logger.error(e.__doc__)

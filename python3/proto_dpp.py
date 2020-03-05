@@ -230,7 +230,7 @@ class ProtoDPP(TKApp):
 		wpa_cli.set('dpp_mud_url', mud_url)
 
 	def dpp_onboard_with_proxy(self, null_arg=0):
-		dpp_proxy.dpp_onboard_proxy(network.get_mac(), self.dpp_uri, self.message_window)
+		dpp_proxy.dpp_onboard_proxy(network.get_mac(), self.dpp_uri, self.message_window, self.qrcode_window)
 
 	# update our mud registry on startup if we have an ethernet connection and user hasn't configured an explicit mud_url.
 	def register_mud_url(self):
