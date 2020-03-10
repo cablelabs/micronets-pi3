@@ -241,12 +241,17 @@ class ProtoDPP(TKApp):
 				vendor = config.get('vendorCode')
 				model_id = config.get('deviceModelUID')
 				pub_key = ecc_keys.public_key_dpp
-				url = "https://registry.micronets.in/mud/v1/register-device/{}/{}/{}".format(vendor, model_id, pub_key)
+				reg_url = config.get('mudRegistrationUrl', 'https://registry.micronets.in/mud/v1/register-device')
+				url = "{}/{}/{}/{}".format(reg_url, vendor, model_id, pub_key)
 				response = requests.post(url, allow_redirects=False)
 				if response.status_code == 301:
 					response = requests.post(response.headers['Location'])
 				if response.status_code == 200:
 					logger.info("device registered")
+					logger.info(" - Vendor Code: {}".format(vendor))
+					logger.info(" - ModelUID: {}".format(model_id))
+					logger.info(" - Pubkey: {}".format(pub_key))
+					logger.info(" - Registration URL: {}".format(reg_url))
 				else:
 					logger.error("Failed to register device: {}".format(response.status_code))
 
@@ -355,8 +360,11 @@ class ProtoDPP(TKApp):
 	# Button events
 	def click_onboard(self, nullArg=0):
 		logger.info("click_onboard")
-		self.cancel_animations()
-		self.set_state(AppState.QRCODE)
+		if self.state == AppState.QRCODE:
+			self.set_state(AppState.STATUS)
+		else:
+			self.cancel_animations()
+			self.set_state(AppState.QRCODE)
 
 	def click_cycle_wifi(self, nullArg=0):
 		self.cancel_animations()

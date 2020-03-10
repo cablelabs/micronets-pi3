@@ -4,6 +4,8 @@
 VERSION="$(cut -d':' -f2 <<<$(lsb_release -r))"
 
 if [ $VERSION -ge 10 ]; then
+	# Note: As of MAR/10/2020, this shouldn't be needed as Adafruit has incorporated it into their script.
+	# But, it is benign (you will see "Touchscreen already configured"). So, leaving in for now.
 	echo "Buster+"
 	if grep -q "touch-swapxy=true" "/boot/config.txt"
 	then
