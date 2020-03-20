@@ -87,7 +87,8 @@ The installation script will install/configure all of the required packages with
  #
  cd ~
  git clone https://git@github.com/cablelabs/micronets-pi3.git
- # Optionally change to desired branch (e.g. git checkout nccoe-build-3)
+ # ensure you are using the nccoe branch
+ git checkout nccoe-build-3
  cd micronets-pi3/deploy
  ./install
  # (take default prompts and reboot)
