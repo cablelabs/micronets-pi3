@@ -127,6 +127,17 @@ You will need to edit `config/networks.json` for the default networks to be prov
 #### Clinic Mode Device Profile
 In the `config/devices` folder are several device profiles to choose from. This is to facilitate having several advertised devices in a demo. The selection for your device is made in `config/config.json`. The default is `device-0`
 
+#### DPP Mode MUD Registry
+If the device is configured to self-register the MUD url on startup (disableMUD == false and Ethernet connected), the URL that is registered can be set using the `dppMUDUrl` attribute. This url can be either an absolute url to the MUD file itself or it can be a URL used to lookup the MUD file url using a registry. By default, the application will use the default CableLabs MUD registry server (`https://registry.micronets.in/mud/v1/model/mud-url`) which requires the parameters VENDOR and MODEL. If you are setting up your own MUD registry server, add the `dppMUDUrl` attribute to the configuration file:
+
+```
+# Absolute MUD URL (not using a MUD registry)
+"dppMUDUrl" : "https://your-mud-file-server.com/<mud-file-path>",
+
+# Dynamic MUD URL
+"dppMUDUrl" : "https://your-mud-registry.com/mud/v1/model/mud-url/<vendor-code>/<device-model>",
+```
+
 ## Runtime environment
 This application is run full screen on the PiTFT device (320x240) and is a TKinter application that runs on the desktop (lightdm), using the desktop configuration file `~/.config/autostart/proto-pi.desktop`. You can also run it on an external monitor or remotely using VNC - in these cases it is best to change the screen resolution to 640x480. (see above)
 
