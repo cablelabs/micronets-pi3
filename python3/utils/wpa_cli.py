@@ -13,8 +13,12 @@ chan_freqs = {1:2412, 2:2417, 3:2422, 4:2427, 5:2432, 6:2437, 7:2442, 8:2447, 9:
 
 def dpp_bootstrap_gen(mac, channel_class, channel, key, vendor):
 
-	cmd = "dpp_bootstrap_gen type=qrcode mac={} chan={}/{} key={} info={}".format(
-		mac, channel_class, channel, key, vendor)
+	if not config.get('disableMUD'):
+		cmd = "dpp_bootstrap_gen type=qrcode mac={} chan={}/{} key={} info={}".format(
+			mac, channel_class, channel, key, vendor)
+	else:
+		cmd = "dpp_bootstrap_gen type=qrcode mac={} chan={}/{} key={}".format(
+			mac, channel_class, channel, key)
 
 	lines = exec_cli(cmd, 1)
 	id = lines[0][0]
